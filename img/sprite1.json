@@ -1,0 +1,12 @@
+{
+	"frames": [
+		{
+			"filename": "spikeBody00",
+			"frame": { "x": 4, "y": 3, "w": 13, "h": 19 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 13, "h": 19 },
+			"sourceSize": { "w": 13, "h": 19 }
+		}
+	]
+}
