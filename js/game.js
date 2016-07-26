@@ -1,5 +1,12 @@
 var input, spikeSprite
 
+var fieldBounds = {
+	LEFT: 0,
+	RIGHT: 319,
+	UP: 12,
+	BOTTOM: 199
+}
+
 onload = function() {
 	var game = new Phaser.Game(320, 200, Phaser.AUTO, document.getElementById('#viewport'), { create: initLvl1, preload: preload, update: update }, false, false)
 }
@@ -18,8 +25,14 @@ var initLvl1 = function(game) {
 
 var update = function(game) {
 	if (input.up.isDown) {
-		spikeSprite.position.y -= 4
+		setIf(function(y) { return y -= 4 }, function(y) { return y > fieldBounds.UP }, spikeSprite.position, 'y')
 	} else if (input.down.isDown) {
-		spikeSprite.position.y += 4
+		setIf(function(y) { return y += 4 }, function(y) { return y < fieldBounds.BOTTOM - 19 }, spikeSprite.position, 'y')
 	}
+}
+
+var setIf = function(action, predicate, object, property) {
+	var updated = action(object[property])
+	if (predicate(updated))
+		object[property] = updated
 }
