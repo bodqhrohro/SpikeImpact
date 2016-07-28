@@ -24,6 +24,7 @@ class SpikeImpactGame {
 		game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE
 		game.scale.setUserScale(3, 3, 0, 0)
 		this.spikeSprite = game.add.tileSprite(30, 30, 13, 19, 'lvl1', 'spikeBody00')
+		this.spikePaw = game.add.tileSprite(15, 15, 8, 10, 'lvl1', 'spikePaw00')
 
 		this.input = game.input.keyboard.createCursorKeys()
 	}
@@ -33,6 +34,8 @@ class SpikeImpactGame {
 			this.setIf((y) => y-=4, (y) => y > this.fieldBounds.UP, this.spikeSprite.position, 'y')
 		} else if (this.input.down.isDown) {
 			this.setIf((y) => y+=4, (y) => y < this.fieldBounds.BOTTOM - 19, this.spikeSprite.position, 'y')
+		} else if (this.input.right.isDown) {
+			this.spikePaw.animations.add('walk').play(5)
 		}
 	}
 

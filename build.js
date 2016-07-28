@@ -95534,6 +95534,7 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 					game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
 					game.scale.setUserScale(3, 3, 0, 0);
 					_this.spikeSprite = game.add.tileSprite(30, 30, 13, 19, 'lvl1', 'spikeBody00');
+					_this.spikePaw = game.add.tileSprite(15, 15, 8, 10, 'lvl1', 'spikePaw00');
 
 					_this.input = game.input.keyboard.createCursorKeys();
 				};
@@ -95551,6 +95552,8 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 						}, function (y) {
 							return y < _this.fieldBounds.BOTTOM - 19;
 						}, _this.spikeSprite.position, 'y');
+					} else if (_this.input.right.isDown) {
+						_this.spikePaw.animations.add('walk').play(5);
 					}
 				};
 
