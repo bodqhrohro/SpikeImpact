@@ -2,3 +2,4 @@
 *.map
 jspm_packages/
 node_modules/
+!jspm_packages/system.js
