@@ -1,5 +1,5 @@
 System.config({
-  baseURL: "/",
+  baseURL: window.href,
   defaultJSExtensions: true,
   transpiler: "babel",
   babelOptions: {
