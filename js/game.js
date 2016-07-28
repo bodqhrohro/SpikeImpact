@@ -1,38 +1,46 @@
-var input, spikeSprite
+import Phaser from 'phaser'
 
-var fieldBounds = {
-	LEFT: 0,
-	RIGHT: 319,
-	UP: 12,
-	BOTTOM: 199
-}
+class SpikeImpactGame {
+	constructor() {
+		this.game = new Phaser.Game(320, 200, Phaser.AUTO, document.getElementById('#viewport'), { create: this.initLvl1, preload: this.preload, update: this.update }, false, false)
+	}
 
-onload = function() {
-	var game = new Phaser.Game(320, 200, Phaser.AUTO, document.getElementById('#viewport'), { create: initLvl1, preload: preload, update: update }, false, false)
-}
+	input = null
 
-var preload = function(game) {
-	game.load.atlas('lvl1', 'img/sprite1.gif', 'img/sprite1.json')
-}
+	spikeSprite = null
 
-var initLvl1 = function(game) {
-	game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE
-	game.scale.setUserScale(3, 3, 0, 0)
-	spikeSprite = game.add.tileSprite(30, 30, 13, 19, 'lvl1', 'spikeBody00')
+	fieldBounds = {
+		LEFT: 0,
+		RIGHT: 319,
+		UP: 12,
+		BOTTOM: 199
+	}
 
-	input = game.input.keyboard.createCursorKeys()
-}
+	preload = (game) => {
+		game.load.atlas('lvl1', 'img/sprite1.gif', 'img/sprite1.json')
+	}
 
-var update = function(game) {
-	if (input.up.isDown) {
-		setIf(function(y) { return y -= 4 }, function(y) { return y > fieldBounds.UP }, spikeSprite.position, 'y')
-	} else if (input.down.isDown) {
-		setIf(function(y) { return y += 4 }, function(y) { return y < fieldBounds.BOTTOM - 19 }, spikeSprite.position, 'y')
+	initLvl1 = (game) => {
+		game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE
+		game.scale.setUserScale(3, 3, 0, 0)
+		this.spikeSprite = game.add.tileSprite(30, 30, 13, 19, 'lvl1', 'spikeBody00')
+
+		this.input = game.input.keyboard.createCursorKeys()
+	}
+
+	update = (game) => {
+		if (this.input.up.isDown) {
+			this.setIf((y) => y-=4, (y) => y > this.fieldBounds.UP, this.spikeSprite.position, 'y')
+		} else if (this.input.down.isDown) {
+			this.setIf((y) => y+=4, (y) => y < this.fieldBounds.BOTTOM - 19, this.spikeSprite.position, 'y')
+		}
+	}
+
+	setIf = (action, predicate, object, property) => {
+		var updated = action(object[property])
+		if (predicate(updated))
+			object[property] = updated
 	}
 }
 
-var setIf = function(action, predicate, object, property) {
-	var updated = action(object[property])
-	if (predicate(updated))
-		object[property] = updated
-}
+export default new SpikeImpactGame()

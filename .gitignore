@@ -1,0 +1,4 @@
+*.sw*
+*.map
+jspm_packages/
+node_modules/

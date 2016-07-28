@@ -3,8 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<title></title>
-	<script src="node_modules/phaser/build/phaser.min.js"></script>
-	<script src="js/game.js"></script>
+	<script src="jspm_packages/system.js"></script>
+	<script src="config.js"></script>
+	<script>
+		System.import('js/game.js')
+	</script>
 </head>
 <body>
 	<div id="viewport"></div>
