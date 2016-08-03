@@ -95501,7 +95501,7 @@ System.registerDynamic("github:photonstorm/phaser@2.6.1.js", ["github:photonstor
 });
 
 System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-check.js', 'github:photonstorm/phaser@2.6.1.js'], function (_export) {
-	var _classCallCheck, Phaser, SpikeImpactGame;
+	var _classCallCheck, Phaser, fieldSize, fieldBounds, SpikeImpactGame;
 
 	return {
 		setters: [function (_npmBabelRuntime5838HelpersClassCallCheckJs) {
@@ -95512,57 +95512,88 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 		execute: function () {
 			'use strict';
 
+			fieldSize = {
+				WIDTH: 320,
+				HEIGHT: 200
+			};
+			fieldBounds = {
+				LEFT: 0,
+				RIGHT: 319,
+				UP: 12,
+				BOTTOM: 199
+			};
+
 			SpikeImpactGame = function SpikeImpactGame() {
 				var _this = this;
 
 				_classCallCheck(this, SpikeImpactGame);
-
-				this.input = null;
-				this.spikeSprite = null;
-				this.fieldBounds = {
-					LEFT: 0,
-					RIGHT: 319,
-					UP: 12,
-					BOTTOM: 199
-				};
 
 				this.preload = function (game) {
 					game.load.atlas('lvl1', 'img/sprite1.gif', 'img/sprite1.json');
 				};
 
 				this.initLvl1 = function (game) {
-					game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
-					game.scale.setUserScale(3, 3, 0, 0);
-					_this.spikeSprite = game.add.tileSprite(30, 30, 13, 19, 'lvl1', 'spikeBody00');
-					_this.spikePaw = game.add.tileSprite(15, 15, 8, 10, 'lvl1', 'spikePaw00');
+					window.addEventListener('resize', _this._onResize);
+					_this._onResize();
+
+					game.stage.backgroundColor = '#b0e7e7';
+					game.stage.smoothed = false;
+
+					_this.spike = game.add.sprite(30, 30, 'lvl1', 'dummy');
+
+					_this.spikePaw = game.add.sprite(1, 3, 'lvl1', 'dummy');
+					_this.spikeBody = game.add.sprite(0, 0, 'lvl1', 'spikeBody00');
+					_this.spike.addChild(_this.spikePaw);
+					_this.spike.addChild(_this.spikeBody);
+
+					_this.spikePaw.animations.add('throw', Phaser.Animation.generateFrameNames('spikePaw', 0, 2, '', 2).concat('dummy'), 10).onComplete.add(_this.createBullet);
 
 					_this.input = game.input.keyboard.createCursorKeys();
+
+					document.querySelector('#viewport .loader').style.display = 'none';
 				};
 
 				this.update = function (game) {
 					if (_this.input.up.isDown) {
-						_this.setIf(function (y) {
+						_this._setIf(function (y) {
 							return y -= 4;
 						}, function (y) {
-							return y > _this.fieldBounds.UP;
-						}, _this.spikeSprite.position, 'y');
+							return y > fieldBounds.UP;
+						}, _this.spike.position, 'y');
 					} else if (_this.input.down.isDown) {
-						_this.setIf(function (y) {
+						_this._setIf(function (y) {
 							return y += 4;
 						}, function (y) {
-							return y < _this.fieldBounds.BOTTOM - 19;
-						}, _this.spikeSprite.position, 'y');
+							return y < fieldBounds.BOTTOM - 19;
+						}, _this.spike.position, 'y');
 					} else if (_this.input.right.isDown) {
-						_this.spikePaw.animations.add('walk').play(5);
+						_this.spikePaw.animations.play('throw');
 					}
 				};
 
-				this.setIf = function (action, predicate, object, property) {
+				this._setIf = function (action, predicate, object, property) {
 					var updated = action(object[property]);
 					if (predicate(updated)) object[property] = updated;
 				};
 
-				this.game = new Phaser.Game(320, 200, Phaser.AUTO, document.getElementById('#viewport'), { create: this.initLvl1, preload: this.preload, update: this.update }, false, false);
+				this.createBullet = function () {
+					var bullet = _this.game.add.sprite(_this.spike.position.x + 13, _this.spike.position.y + 4, 'lvl1', 'scroll');
+					_this.game.time.events.loop(Phaser.Timer.SECOND * 0.05, function () {
+						return bullet.position.x++;
+					});
+				};
+
+				this._onResize = function () {
+					var scaleFactor = Math.min(window.innerWidth / fieldSize.WIDTH, window.innerHeight / fieldSize.HEIGHT) | 0;
+					_this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+					_this.game.scale.setUserScale(scaleFactor, scaleFactor, 0, 0);
+				};
+
+				this.game = new Phaser.Game(fieldSize.WIDTH, fieldSize.HEIGHT, Phaser.AUTO, document.getElementById('viewport'), {
+					create: this.initLvl1,
+					preload: this.preload,
+					update: this.update
+				}, false, false);
 			};
 
 			_export('default', new SpikeImpactGame());
