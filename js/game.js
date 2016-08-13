@@ -40,12 +40,24 @@ class SpikeImpactGame {
 		game.stage.backgroundColor = '#b0e7e7'
 		game.stage.smoothed = false
 
-		this.spike = game.add.sprite(30, 30, 'lvl1', 'dummy')
+		this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy')
+
+		this.spike = game.add.sprite(15, 0, 'lvl1', 'dummy')
 
 		this.spikePaw = game.add.sprite(1, 3, 'lvl1', 'dummy')
 		this.spikeBody = game.add.sprite(0, 0, 'lvl1', 'spikeBody00')
 		this.spike.addChild(this.spikePaw)
 		this.spike.addChild(this.spikeBody)
+
+		this.twilightBody = game.add.sprite(0, 0, 'lvl1', 'twilightBody')
+		this.twilightWing = game.add.sprite(9, 18, 'lvl1', 'twilightWing')
+
+		this.twilightWing.anchor.setTo(0, 1)
+		this.game.time.events.loop(Phaser.Timer.SECOND * 0.4, () => this.twilightWing.scale.y = -this.twilightWing.scale.y)
+
+		this.twilight.addChild(this.twilightBody)
+		this.twilight.addChild(this.spike)
+		this.twilight.addChild(this.twilightWing)
 
 		this.spikePaw.animations.add(
 			'throw',
@@ -60,9 +72,11 @@ class SpikeImpactGame {
 
 	update = (game) => {
 		if (this.input.up.isDown) {
-			this._setIf((y) => y-=4, (y) => y > fieldBounds.UP, this.spike.position, 'y')
+			this.twilightWing.scale.y = -1
+			this._setIf((y) => y-=4, (y) => y > fieldBounds.UP, this.twilight.position, 'y')
 		} else if (this.input.down.isDown) {
-			this._setIf((y) => y+=4, (y) => y < fieldBounds.BOTTOM - 19, this.spike.position, 'y')
+			this.twilightWing.scale.y = 1
+			this._setIf((y) => y+=4, (y) => y < fieldBounds.BOTTOM - 19, this.twilight.position, 'y')
 		} else if (this.input.right.isDown) {
 			this.spikePaw.animations.play('throw')
 		}
@@ -75,7 +89,8 @@ class SpikeImpactGame {
 	}
 
 	createBullet = () => {
-		let bullet = this.game.add.sprite(this.spike.position.x + 13, this.spike.position.y + 4, 'lvl1', 'scroll')
+		let bullet = new Phaser.Sprite(this.game, this.spike.world.x + 13, this.spike.world.y + 4, 'lvl1', 'scroll')
+		this.game.world.addChildAt(bullet, 0)
 		this.game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => bullet.position.x++)
 	}
 

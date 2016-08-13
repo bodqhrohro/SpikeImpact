@@ -95539,12 +95539,26 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 					game.stage.backgroundColor = '#b0e7e7';
 					game.stage.smoothed = false;
 
-					_this.spike = game.add.sprite(30, 30, 'lvl1', 'dummy');
+					_this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy');
+
+					_this.spike = game.add.sprite(15, 0, 'lvl1', 'dummy');
 
 					_this.spikePaw = game.add.sprite(1, 3, 'lvl1', 'dummy');
 					_this.spikeBody = game.add.sprite(0, 0, 'lvl1', 'spikeBody00');
 					_this.spike.addChild(_this.spikePaw);
 					_this.spike.addChild(_this.spikeBody);
+
+					_this.twilightBody = game.add.sprite(0, 0, 'lvl1', 'twilightBody');
+					_this.twilightWing = game.add.sprite(9, 18, 'lvl1', 'twilightWing');
+
+					_this.twilightWing.anchor.setTo(0, 1);
+					_this.game.time.events.loop(Phaser.Timer.SECOND * 0.4, function () {
+						return _this.twilightWing.scale.y = -_this.twilightWing.scale.y;
+					});
+
+					_this.twilight.addChild(_this.twilightBody);
+					_this.twilight.addChild(_this.spike);
+					_this.twilight.addChild(_this.twilightWing);
 
 					_this.spikePaw.animations.add('throw', Phaser.Animation.generateFrameNames('spikePaw', 0, 2, '', 2).concat('dummy'), 10).onComplete.add(_this.createBullet);
 
@@ -95555,17 +95569,19 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 
 				this.update = function (game) {
 					if (_this.input.up.isDown) {
+						_this.twilightWing.scale.y = -1;
 						_this._setIf(function (y) {
 							return y -= 4;
 						}, function (y) {
 							return y > fieldBounds.UP;
-						}, _this.spike.position, 'y');
+						}, _this.twilight.position, 'y');
 					} else if (_this.input.down.isDown) {
+						_this.twilightWing.scale.y = 1;
 						_this._setIf(function (y) {
 							return y += 4;
 						}, function (y) {
 							return y < fieldBounds.BOTTOM - 19;
-						}, _this.spike.position, 'y');
+						}, _this.twilight.position, 'y');
 					} else if (_this.input.right.isDown) {
 						_this.spikePaw.animations.play('throw');
 					}
@@ -95577,7 +95593,8 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 				};
 
 				this.createBullet = function () {
-					var bullet = _this.game.add.sprite(_this.spike.position.x + 13, _this.spike.position.y + 4, 'lvl1', 'scroll');
+					var bullet = new Phaser.Sprite(_this.game, _this.spike.world.x + 13, _this.spike.world.y + 4, 'lvl1', 'scroll');
+					_this.game.world.addChildAt(bullet, 0);
 					_this.game.time.events.loop(Phaser.Timer.SECOND * 0.05, function () {
 						return bullet.position.x++;
 					});

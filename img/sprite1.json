@@ -48,5 +48,21 @@
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 9, "h": 3 },
 			"sourceSize": { "w": 9, "h": 3 }
 		}
+		,{
+			"filename": "twilightBody",
+			"frame": { "x": 11, "y": 29, "w": 37, "h": 29 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 37, "h": 29 },
+			"sourceSize": { "w": 37, "h": 29 }
+		}
+		,{
+			"filename": "twilightWing",
+			"frame": { "x": 53, "y": 30, "w": 13, "h": 16 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 13, "h": 16 },
+			"sourceSize": { "w": 13, "h": 16 }
+		}
 	]
 }
