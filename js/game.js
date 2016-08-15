@@ -40,6 +40,12 @@ class SpikeImpactGame {
 		game.stage.backgroundColor = '#b0e7e7'
 		game.stage.smoothed = false
 
+		this.scrolls = game.add.weapon(40, 'lvl1', 'scroll')
+		this.scrolls.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS
+		this.scrolls.bulletSpeed = 50
+		this.scrolls.fireRate = 10
+		this.scrolls.fireAngle = 0
+
 		this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy')
 
 		this.spike = game.add.sprite(15, 0, 'lvl1', 'dummy')
@@ -48,6 +54,7 @@ class SpikeImpactGame {
 		this.spikeBody = game.add.sprite(0, 0, 'lvl1', 'spikeBody00')
 		this.spike.addChild(this.spikePaw)
 		this.spike.addChild(this.spikeBody)
+		this.scrolls.trackSprite(this.spike, 13, 5)
 
 		this.twilightBody = game.add.sprite(0, 0, 'lvl1', 'twilightBody')
 		this.twilightWing = game.add.sprite(9, 18, 'lvl1', 'twilightWing')
@@ -63,7 +70,7 @@ class SpikeImpactGame {
 			'throw',
 			Phaser.Animation.generateFrameNames('spikePaw', 0, 2, '', 2).concat('dummy'),
 			10
-		).onComplete.add(this.createBullet)
+		).onComplete.add(() => this.scrolls.fire())
 
 		this.input = game.input.keyboard.createCursorKeys()
 
@@ -86,12 +93,6 @@ class SpikeImpactGame {
 		let updated = action(object[property])
 		if (predicate(updated))
 			object[property] = updated
-	}
-
-	createBullet = () => {
-		let bullet = new Phaser.Sprite(this.game, this.spike.world.x + 13, this.spike.world.y + 4, 'lvl1', 'scroll')
-		this.game.world.addChildAt(bullet, 0)
-		this.game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => bullet.position.x++)
 	}
 
 	_onResize = () => {

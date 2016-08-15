@@ -95539,6 +95539,12 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 					game.stage.backgroundColor = '#b0e7e7';
 					game.stage.smoothed = false;
 
+					_this.scrolls = game.add.weapon(40, 'lvl1', 'scroll');
+					_this.scrolls.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+					_this.scrolls.bulletSpeed = 50;
+					_this.scrolls.fireRate = 10;
+					_this.scrolls.fireAngle = 0;
+
 					_this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy');
 
 					_this.spike = game.add.sprite(15, 0, 'lvl1', 'dummy');
@@ -95547,6 +95553,7 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 					_this.spikeBody = game.add.sprite(0, 0, 'lvl1', 'spikeBody00');
 					_this.spike.addChild(_this.spikePaw);
 					_this.spike.addChild(_this.spikeBody);
+					_this.scrolls.trackSprite(_this.spike, 13, 5);
 
 					_this.twilightBody = game.add.sprite(0, 0, 'lvl1', 'twilightBody');
 					_this.twilightWing = game.add.sprite(9, 18, 'lvl1', 'twilightWing');
@@ -95560,7 +95567,9 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 					_this.twilight.addChild(_this.spike);
 					_this.twilight.addChild(_this.twilightWing);
 
-					_this.spikePaw.animations.add('throw', Phaser.Animation.generateFrameNames('spikePaw', 0, 2, '', 2).concat('dummy'), 10).onComplete.add(_this.createBullet);
+					_this.spikePaw.animations.add('throw', Phaser.Animation.generateFrameNames('spikePaw', 0, 2, '', 2).concat('dummy'), 10).onComplete.add(function () {
+						return _this.scrolls.fire();
+					});
 
 					_this.input = game.input.keyboard.createCursorKeys();
 
@@ -95590,14 +95599,6 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 				this._setIf = function (action, predicate, object, property) {
 					var updated = action(object[property]);
 					if (predicate(updated)) object[property] = updated;
-				};
-
-				this.createBullet = function () {
-					var bullet = new Phaser.Sprite(_this.game, _this.spike.world.x + 13, _this.spike.world.y + 4, 'lvl1', 'scroll');
-					_this.game.world.addChildAt(bullet, 0);
-					_this.game.time.events.loop(Phaser.Timer.SECOND * 0.05, function () {
-						return bullet.position.x++;
-					});
 				};
 
 				this._onResize = function () {

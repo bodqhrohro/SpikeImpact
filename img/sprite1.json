@@ -34,15 +34,15 @@
 		}
 		,{
 			"filename": "spikePaw02",
-			"frame": { "x": 36, "y": 4, "w": 10, "h": 8 },
+			"frame": { "x": 36, "y": 4, "w": 7, "h": 8 },
 			"rotated": false,
 			"trimmed": true,
-			"spriteSourceSize": { "x": 4, "y": 0, "w": 10, "h": 8 },
-			"sourceSize": { "w": 10, "h": 8 }
+			"spriteSourceSize": { "x": 4, "y": 0, "w": 7, "h": 8 },
+			"sourceSize": { "w": 7, "h": 8 }
 		}
 		,{
 			"filename": "scroll",
-			"frame": { "x": 48, "y": 5, "w": 9, "h": 3 },
+			"frame": { "x": 47, "y": 5, "w": 9, "h": 3 },
 			"rotated": false,
 			"trimmed": true,
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 9, "h": 3 },
