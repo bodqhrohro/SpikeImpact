@@ -13,6 +13,280 @@ System.registerDynamic("npm:babel-runtime@5.8.38/helpers/class-call-check.js", [
   return module.exports;
 });
 
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.global.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+  if (typeof __g == 'number')
+    __g = global;
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.a-function.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = function(it) {
+    if (typeof it != 'function')
+      throw TypeError(it + ' is not a function!');
+    return it;
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.ctx.js", ["npm:core-js@1.2.7/library/modules/$.a-function.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var aFunction = $__require('npm:core-js@1.2.7/library/modules/$.a-function.js');
+  module.exports = function(fn, that, length) {
+    aFunction(fn);
+    if (that === undefined)
+      return fn;
+    switch (length) {
+      case 1:
+        return function(a) {
+          return fn.call(that, a);
+        };
+      case 2:
+        return function(a, b) {
+          return fn.call(that, a, b);
+        };
+      case 3:
+        return function(a, b, c) {
+          return fn.call(that, a, b, c);
+        };
+    }
+    return function() {
+      return fn.apply(that, arguments);
+    };
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.export.js", ["npm:core-js@1.2.7/library/modules/$.global.js", "npm:core-js@1.2.7/library/modules/$.core.js", "npm:core-js@1.2.7/library/modules/$.ctx.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var global = $__require('npm:core-js@1.2.7/library/modules/$.global.js'),
+      core = $__require('npm:core-js@1.2.7/library/modules/$.core.js'),
+      ctx = $__require('npm:core-js@1.2.7/library/modules/$.ctx.js'),
+      PROTOTYPE = 'prototype';
+  var $export = function(type, name, source) {
+    var IS_FORCED = type & $export.F,
+        IS_GLOBAL = type & $export.G,
+        IS_STATIC = type & $export.S,
+        IS_PROTO = type & $export.P,
+        IS_BIND = type & $export.B,
+        IS_WRAP = type & $export.W,
+        exports = IS_GLOBAL ? core : core[name] || (core[name] = {}),
+        target = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE],
+        key,
+        own,
+        out;
+    if (IS_GLOBAL)
+      source = name;
+    for (key in source) {
+      own = !IS_FORCED && target && key in target;
+      if (own && key in exports)
+        continue;
+      out = own ? target[key] : source[key];
+      exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key] : IS_BIND && own ? ctx(out, global) : IS_WRAP && target[key] == out ? (function(C) {
+        var F = function(param) {
+          return this instanceof C ? new C(param) : C(param);
+        };
+        F[PROTOTYPE] = C[PROTOTYPE];
+        return F;
+      })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+      if (IS_PROTO)
+        (exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+    }
+  };
+  $export.F = 1;
+  $export.G = 2;
+  $export.S = 4;
+  $export.P = 8;
+  $export.B = 16;
+  $export.W = 32;
+  module.exports = $export;
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var $Object = Object;
+  module.exports = {
+    create: $Object.create,
+    getProto: $Object.getPrototypeOf,
+    isEnum: {}.propertyIsEnumerable,
+    getDesc: $Object.getOwnPropertyDescriptor,
+    setDesc: $Object.defineProperty,
+    setDescs: $Object.defineProperties,
+    getKeys: $Object.keys,
+    getNames: $Object.getOwnPropertyNames,
+    getSymbols: $Object.getOwnPropertySymbols,
+    each: [].forEach
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.defined.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = function(it) {
+    if (it == undefined)
+      throw TypeError("Can't call method on  " + it);
+    return it;
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.to-object.js", ["npm:core-js@1.2.7/library/modules/$.defined.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var defined = $__require('npm:core-js@1.2.7/library/modules/$.defined.js');
+  module.exports = function(it) {
+    return Object(defined(it));
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.cof.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var toString = {}.toString;
+  module.exports = function(it) {
+    return toString.call(it).slice(8, -1);
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.iobject.js", ["npm:core-js@1.2.7/library/modules/$.cof.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var cof = $__require('npm:core-js@1.2.7/library/modules/$.cof.js');
+  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
+    return cof(it) == 'String' ? it.split('') : Object(it);
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.fails.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = function(exec) {
+    try {
+      return !!exec();
+    } catch (e) {
+      return true;
+    }
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.object-assign.js", ["npm:core-js@1.2.7/library/modules/$.js", "npm:core-js@1.2.7/library/modules/$.to-object.js", "npm:core-js@1.2.7/library/modules/$.iobject.js", "npm:core-js@1.2.7/library/modules/$.fails.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var $ = $__require('npm:core-js@1.2.7/library/modules/$.js'),
+      toObject = $__require('npm:core-js@1.2.7/library/modules/$.to-object.js'),
+      IObject = $__require('npm:core-js@1.2.7/library/modules/$.iobject.js');
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.fails.js')(function() {
+    var a = Object.assign,
+        A = {},
+        B = {},
+        S = Symbol(),
+        K = 'abcdefghijklmnopqrst';
+    A[S] = 7;
+    K.split('').forEach(function(k) {
+      B[k] = k;
+    });
+    return a({}, A)[S] != 7 || Object.keys(a({}, B)).join('') != K;
+  }) ? function assign(target, source) {
+    var T = toObject(target),
+        $$ = arguments,
+        $$len = $$.length,
+        index = 1,
+        getKeys = $.getKeys,
+        getSymbols = $.getSymbols,
+        isEnum = $.isEnum;
+    while ($$len > index) {
+      var S = IObject($$[index++]),
+          keys = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S),
+          length = keys.length,
+          j = 0,
+          key;
+      while (length > j)
+        if (isEnum.call(S, key = keys[j++]))
+          T[key] = S[key];
+    }
+    return T;
+  } : Object.assign;
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/es6.object.assign.js", ["npm:core-js@1.2.7/library/modules/$.export.js", "npm:core-js@1.2.7/library/modules/$.object-assign.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var $export = $__require('npm:core-js@1.2.7/library/modules/$.export.js');
+  $export($export.S + $export.F, 'Object', {assign: $__require('npm:core-js@1.2.7/library/modules/$.object-assign.js')});
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.core.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var core = module.exports = {version: '1.2.6'};
+  if (typeof __e == 'number')
+    __e = core;
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/fn/object/assign.js", ["npm:core-js@1.2.7/library/modules/es6.object.assign.js", "npm:core-js@1.2.7/library/modules/$.core.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  $__require('npm:core-js@1.2.7/library/modules/es6.object.assign.js');
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.core.js').Object.assign;
+  return module.exports;
+});
+
+System.registerDynamic("npm:babel-runtime@5.8.38/core-js/object/assign.js", ["npm:core-js@1.2.7/library/fn/object/assign.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = {
+    "default": $__require('npm:core-js@1.2.7/library/fn/object/assign.js'),
+    __esModule: true
+  };
+  return module.exports;
+});
+
 System.registerDynamic("github:photonstorm/phaser@2.6.1/build/phaser.js", [], false, function ($__require, $__exports, $__module) {
     var _retrieveGlobal = System.get("@@global-helpers").prepareGlobal($__module.id, "Phaser", null);
 
@@ -95500,12 +95774,14 @@ System.registerDynamic("github:photonstorm/phaser@2.6.1.js", ["github:photonstor
   return module.exports;
 });
 
-System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-check.js', 'github:photonstorm/phaser@2.6.1.js'], function (_export) {
-	var _classCallCheck, Phaser, fieldSize, fieldBounds, SpikeImpactGame;
+System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-check.js', 'npm:babel-runtime@5.8.38/core-js/object/assign.js', 'github:photonstorm/phaser@2.6.1.js'], function (_export) {
+	var _classCallCheck, _Object$assign, Phaser, fieldSize, fieldBounds, SpikeImpactGame;
 
 	return {
 		setters: [function (_npmBabelRuntime5838HelpersClassCallCheckJs) {
 			_classCallCheck = _npmBabelRuntime5838HelpersClassCallCheckJs['default'];
+		}, function (_npmBabelRuntime5838CoreJsObjectAssignJs) {
+			_Object$assign = _npmBabelRuntime5838CoreJsObjectAssignJs['default'];
 		}, function (_githubPhotonstormPhaser261Js) {
 			Phaser = _githubPhotonstormPhaser261Js['default'];
 		}],
@@ -95571,27 +95847,46 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 						return _this.scrolls.fire();
 					});
 
-					_this.input = game.input.keyboard.createCursorKeys();
+					_this.input = _Object$assign(game.input.keyboard.createCursorKeys(), {
+						space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
+						enter: game.input.keyboard.addKey(Phaser.KeyCode.ENTER),
+						w: game.input.keyboard.addKey(Phaser.KeyCode.W),
+						a: game.input.keyboard.addKey(Phaser.KeyCode.A),
+						s: game.input.keyboard.addKey(Phaser.KeyCode.S),
+						d: game.input.keyboard.addKey(Phaser.KeyCode.D)
+					});
 
 					document.querySelector('#viewport .loader').style.display = 'none';
 				};
 
 				this.update = function (game) {
-					if (_this.input.up.isDown) {
+					if (_this.input.up.isDown || _this.input.w.isDown) {
 						_this.twilightWing.scale.y = -1;
 						_this._setIf(function (y) {
 							return y -= 4;
 						}, function (y) {
 							return y > fieldBounds.UP;
 						}, _this.twilight.position, 'y');
-					} else if (_this.input.down.isDown) {
+					} else if (_this.input.down.isDown || _this.input.s.isDown) {
 						_this.twilightWing.scale.y = 1;
 						_this._setIf(function (y) {
 							return y += 4;
 						}, function (y) {
 							return y < fieldBounds.BOTTOM - 19;
 						}, _this.twilight.position, 'y');
-					} else if (_this.input.right.isDown) {
+					} else if (_this.input.left.isDown || _this.input.a.isDown) {
+						_this._setIf(function (x) {
+							return x -= 4;
+						}, function (x) {
+							return x > fieldBounds.LEFT;
+						}, _this.twilight.position, 'x');
+					} else if (_this.input.right.isDown || _this.input.d.isDown) {
+						_this._setIf(function (x) {
+							return x += 4;
+						}, function (x) {
+							return x < fieldBounds.RIGHT - 30;
+						}, _this.twilight.position, 'x');
+					} else if (_this.input.space.isDown || _this.input.enter.isDown) {
 						_this.spikePaw.animations.play('throw');
 					}
 				};

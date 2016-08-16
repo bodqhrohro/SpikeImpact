@@ -72,19 +72,30 @@ class SpikeImpactGame {
 			10
 		).onComplete.add(() => this.scrolls.fire())
 
-		this.input = game.input.keyboard.createCursorKeys()
+		this.input = Object.assign(game.input.keyboard.createCursorKeys(), {
+			space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
+			enter: game.input.keyboard.addKey(Phaser.KeyCode.ENTER),
+			w: game.input.keyboard.addKey(Phaser.KeyCode.W),
+			a: game.input.keyboard.addKey(Phaser.KeyCode.A),
+			s: game.input.keyboard.addKey(Phaser.KeyCode.S),
+			d: game.input.keyboard.addKey(Phaser.KeyCode.D)
+		})
 
 		document.querySelector('#viewport .loader').style.display = 'none'
 	}
 
 	update = (game) => {
-		if (this.input.up.isDown) {
+		if (this.input.up.isDown || this.input.w.isDown) {
 			this.twilightWing.scale.y = -1
 			this._setIf((y) => y-=4, (y) => y > fieldBounds.UP, this.twilight.position, 'y')
-		} else if (this.input.down.isDown) {
+		} else if (this.input.down.isDown || this.input.s.isDown) {
 			this.twilightWing.scale.y = 1
 			this._setIf((y) => y+=4, (y) => y < fieldBounds.BOTTOM - 19, this.twilight.position, 'y')
-		} else if (this.input.right.isDown) {
+		} else if (this.input.left.isDown || this.input.a.isDown) {
+			this._setIf((x) => x-=4, (x) => x > fieldBounds.LEFT, this.twilight.position, 'x')
+		} else if (this.input.right.isDown || this.input.d.isDown) {
+			this._setIf((x) => x+=4, (x) => x < fieldBounds.RIGHT - 30, this.twilight.position, 'x')
+		} else if (this.input.space.isDown || this.input.enter.isDown) {
 			this.spikePaw.animations.play('throw')
 		}
 	}

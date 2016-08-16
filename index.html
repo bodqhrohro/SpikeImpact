@@ -15,14 +15,56 @@
 		#viewport canvas {
 			margin: auto;
 		}
+		#touchKeys {
+			display: none;
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			font-size: 8em;
+			color: rgba(255, 0, 0, 0.2);
+		}
+		#touchKeys .block {
+			position: absolute;
+			bottom: 0;
+		}
+		#touchKeys .left {
+			left: 0;
+		}
+		#touchKeys .right {
+			right: 0;
+		}
+		#touchKeys .block > * {
+			width: 1em;
+			text-align: center;
+		}
+		#touchKeys .block > .active {
+			background-color: rgba(128, 128, 128, .5);
+		}
 	</style>
 	<script src="jspm_packages/system.js"></script>
 	<script src="config.js"></script>
 	<script>
-		System.import('js/game.js')
+		System.import('js/game.js').then(function(game) {
+			System.import('js/virtkb.js').then(function(virtkb) {
+				virtkb.default(game.default.game)
+			})
+		})
 	</script>
 </head>
 <body>
 	<div id="viewport"><span class="loader">Грузиццо</span></div>
+	<div id="touchKeys">
+		<div class="left block">
+			<div class="up">8</div>
+			<div class="down">0</div>
+			<div class="bonus">6</div>
+		</div>
+		<div class="right block">
+			<div class="left">*</div>
+			<div class="right">#</div>
+			<div class="shoot">3</div>
+		</div>
+	</div>
 </body>
 </html>
