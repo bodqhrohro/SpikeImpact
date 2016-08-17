@@ -13,14 +13,384 @@ System.registerDynamic("npm:babel-runtime@5.8.38/helpers/class-call-check.js", [
   return module.exports;
 });
 
-System.registerDynamic("npm:core-js@1.2.7/library/modules/$.global.js", [], true, function($__require, exports, module) {
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.to-object.js", ["npm:core-js@1.2.7/library/modules/$.defined.js"], true, function($__require, exports, module) {
   ;
   var define,
       global = this,
       GLOBAL = this;
-  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-  if (typeof __g == 'number')
-    __g = global;
+  var defined = $__require('npm:core-js@1.2.7/library/modules/$.defined.js');
+  module.exports = function(it) {
+    return Object(defined(it));
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.object-assign.js", ["npm:core-js@1.2.7/library/modules/$.js", "npm:core-js@1.2.7/library/modules/$.to-object.js", "npm:core-js@1.2.7/library/modules/$.iobject.js", "npm:core-js@1.2.7/library/modules/$.fails.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var $ = $__require('npm:core-js@1.2.7/library/modules/$.js'),
+      toObject = $__require('npm:core-js@1.2.7/library/modules/$.to-object.js'),
+      IObject = $__require('npm:core-js@1.2.7/library/modules/$.iobject.js');
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.fails.js')(function() {
+    var a = Object.assign,
+        A = {},
+        B = {},
+        S = Symbol(),
+        K = 'abcdefghijklmnopqrst';
+    A[S] = 7;
+    K.split('').forEach(function(k) {
+      B[k] = k;
+    });
+    return a({}, A)[S] != 7 || Object.keys(a({}, B)).join('') != K;
+  }) ? function assign(target, source) {
+    var T = toObject(target),
+        $$ = arguments,
+        $$len = $$.length,
+        index = 1,
+        getKeys = $.getKeys,
+        getSymbols = $.getSymbols,
+        isEnum = $.isEnum;
+    while ($$len > index) {
+      var S = IObject($$[index++]),
+          keys = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S),
+          length = keys.length,
+          j = 0,
+          key;
+      while (length > j)
+        if (isEnum.call(S, key = keys[j++]))
+          T[key] = S[key];
+    }
+    return T;
+  } : Object.assign;
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/es6.object.assign.js", ["npm:core-js@1.2.7/library/modules/$.export.js", "npm:core-js@1.2.7/library/modules/$.object-assign.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var $export = $__require('npm:core-js@1.2.7/library/modules/$.export.js');
+  $export($export.S + $export.F, 'Object', {assign: $__require('npm:core-js@1.2.7/library/modules/$.object-assign.js')});
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/fn/object/assign.js", ["npm:core-js@1.2.7/library/modules/es6.object.assign.js", "npm:core-js@1.2.7/library/modules/$.core.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  $__require('npm:core-js@1.2.7/library/modules/es6.object.assign.js');
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.core.js').Object.assign;
+  return module.exports;
+});
+
+System.registerDynamic("npm:babel-runtime@5.8.38/core-js/object/assign.js", ["npm:core-js@1.2.7/library/fn/object/assign.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = {
+    "default": $__require('npm:core-js@1.2.7/library/fn/object/assign.js'),
+    __esModule: true
+  };
+  return module.exports;
+});
+
+System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-check.js', 'npm:babel-runtime@5.8.38/core-js/object/assign.js', 'github:photonstorm/phaser@2.6.1.js'], function (_export) {
+	var _classCallCheck, _Object$assign, Phaser, fieldSize, fieldBounds, SpikeImpactGame;
+
+	return {
+		setters: [function (_npmBabelRuntime5838HelpersClassCallCheckJs) {
+			_classCallCheck = _npmBabelRuntime5838HelpersClassCallCheckJs['default'];
+		}, function (_npmBabelRuntime5838CoreJsObjectAssignJs) {
+			_Object$assign = _npmBabelRuntime5838CoreJsObjectAssignJs['default'];
+		}, function (_githubPhotonstormPhaser261Js) {
+			Phaser = _githubPhotonstormPhaser261Js['default'];
+		}],
+		execute: function () {
+			'use strict';
+
+			fieldSize = {
+				WIDTH: 320,
+				HEIGHT: 200
+			};
+			fieldBounds = {
+				LEFT: 0,
+				RIGHT: 319,
+				UP: 12,
+				BOTTOM: 199
+			};
+
+			SpikeImpactGame = function SpikeImpactGame() {
+				var _this = this;
+
+				_classCallCheck(this, SpikeImpactGame);
+
+				this.preload = function (game) {
+					game.load.atlas('lvl1', 'img/sprite1.gif', 'img/sprite1.json');
+				};
+
+				this.initLvl1 = function (game) {
+					window.addEventListener('resize', _this._onResize);
+					_this._onResize();
+
+					game.stage.backgroundColor = '#b0e7e7';
+					game.stage.smoothed = false;
+
+					_this.scrolls = game.add.weapon(40, 'lvl1', 'scroll');
+					_this.scrolls.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+					_this.scrolls.bulletSpeed = 50;
+					_this.scrolls.fireRate = 10;
+					_this.scrolls.fireAngle = 0;
+
+					_this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy');
+
+					_this.spike = game.add.sprite(15, 0, 'lvl1', 'dummy');
+
+					_this.spikePaw = game.add.sprite(1, 3, 'lvl1', 'dummy');
+					_this.spikeBody = game.add.sprite(0, 0, 'lvl1', 'spikeBody00');
+					_this.spike.addChild(_this.spikePaw);
+					_this.spike.addChild(_this.spikeBody);
+					_this.scrolls.trackSprite(_this.spike, 13, 5);
+
+					_this.twilightBody = game.add.sprite(0, 0, 'lvl1', 'twilightBody');
+					_this.twilightWing = game.add.sprite(9, 18, 'lvl1', 'twilightWing');
+
+					_this.twilightWing.anchor.setTo(0, 1);
+					_this.game.time.events.loop(Phaser.Timer.SECOND * 0.4, function () {
+						return _this.twilightWing.scale.y = -_this.twilightWing.scale.y;
+					});
+
+					_this.twilight.addChild(_this.twilightBody);
+					_this.twilight.addChild(_this.spike);
+					_this.twilight.addChild(_this.twilightWing);
+
+					_this.spikePaw.animations.add('throw', Phaser.Animation.generateFrameNames('spikePaw', 0, 2, '', 2).concat('dummy'), 10).onComplete.add(function () {
+						return _this.scrolls.fire();
+					});
+
+					_this.game.time.events.loop(Phaser.Timer.SECOND * 0.4, function () {
+						return game.world.rotation++;
+					});
+
+					_this.input = _Object$assign(game.input.keyboard.createCursorKeys(), {
+						space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
+						enter: game.input.keyboard.addKey(Phaser.KeyCode.ENTER),
+						w: game.input.keyboard.addKey(Phaser.KeyCode.W),
+						a: game.input.keyboard.addKey(Phaser.KeyCode.A),
+						s: game.input.keyboard.addKey(Phaser.KeyCode.S),
+						d: game.input.keyboard.addKey(Phaser.KeyCode.D)
+					});
+
+					document.querySelector('#viewport .loader').style.display = 'none';
+				};
+
+				this.update = function (game) {
+					if (_this.input.up.isDown || _this.input.w.isDown) {
+						_this.twilightWing.scale.y = -1;
+						_this._setIf(function (y) {
+							return y -= 4;
+						}, function (y) {
+							return y > fieldBounds.UP;
+						}, _this.twilight.position, 'y');
+					} else if (_this.input.down.isDown || _this.input.s.isDown) {
+						_this.twilightWing.scale.y = 1;
+						_this._setIf(function (y) {
+							return y += 4;
+						}, function (y) {
+							return y < fieldBounds.BOTTOM - 19;
+						}, _this.twilight.position, 'y');
+					} else if (_this.input.left.isDown || _this.input.a.isDown) {
+						_this._setIf(function (x) {
+							return x -= 4;
+						}, function (x) {
+							return x > fieldBounds.LEFT;
+						}, _this.twilight.position, 'x');
+					} else if (_this.input.right.isDown || _this.input.d.isDown) {
+						_this._setIf(function (x) {
+							return x += 4;
+						}, function (x) {
+							return x < fieldBounds.RIGHT - 30;
+						}, _this.twilight.position, 'x');
+					} else if (_this.input.space.isDown || _this.input.enter.isDown) {
+						_this.spikePaw.animations.play('throw');
+					}
+				};
+
+				this._setIf = function (action, predicate, object, property) {
+					var updated = action(object[property]);
+					if (predicate(updated)) object[property] = updated;
+				};
+
+				this._onResize = function () {
+					var scaleFactor = Math.min(window.innerWidth / fieldSize.WIDTH, window.innerHeight / fieldSize.HEIGHT) | 0;
+					_this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+					_this.game.scale.setUserScale(scaleFactor, scaleFactor, 0, 0);
+				};
+
+				this.game = new Phaser.Game(fieldSize.WIDTH, fieldSize.HEIGHT, Phaser.AUTO, document.getElementById('viewport'), {
+					create: this.initLvl1,
+					preload: this.preload,
+					update: this.update
+				}, false, false);
+			};
+
+			_export('default', new SpikeImpactGame());
+		}
+	};
+});
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.add-to-unscopables.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = function() {};
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.iter-step.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = function(done, value) {
+    return {
+      value: value,
+      done: !!done
+    };
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.iobject.js", ["npm:core-js@1.2.7/library/modules/$.cof.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var cof = $__require('npm:core-js@1.2.7/library/modules/$.cof.js');
+  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
+    return cof(it) == 'String' ? it.split('') : Object(it);
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.to-iobject.js", ["npm:core-js@1.2.7/library/modules/$.iobject.js", "npm:core-js@1.2.7/library/modules/$.defined.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var IObject = $__require('npm:core-js@1.2.7/library/modules/$.iobject.js'),
+      defined = $__require('npm:core-js@1.2.7/library/modules/$.defined.js');
+  module.exports = function(it) {
+    return IObject(defined(it));
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/es6.array.iterator.js", ["npm:core-js@1.2.7/library/modules/$.add-to-unscopables.js", "npm:core-js@1.2.7/library/modules/$.iter-step.js", "npm:core-js@1.2.7/library/modules/$.iterators.js", "npm:core-js@1.2.7/library/modules/$.to-iobject.js", "npm:core-js@1.2.7/library/modules/$.iter-define.js"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var addToUnscopables = $__require('npm:core-js@1.2.7/library/modules/$.add-to-unscopables.js'),
+      step = $__require('npm:core-js@1.2.7/library/modules/$.iter-step.js'),
+      Iterators = $__require('npm:core-js@1.2.7/library/modules/$.iterators.js'),
+      toIObject = $__require('npm:core-js@1.2.7/library/modules/$.to-iobject.js');
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.iter-define.js')(Array, 'Array', function(iterated, kind) {
+    this._t = toIObject(iterated);
+    this._i = 0;
+    this._k = kind;
+  }, function() {
+    var O = this._t,
+        kind = this._k,
+        index = this._i++;
+    if (!O || index >= O.length) {
+      this._t = undefined;
+      return step(1);
+    }
+    if (kind == 'keys')
+      return step(0, index);
+    if (kind == 'values')
+      return step(0, O[index]);
+    return step(0, [index, O[index]]);
+  }, 'values');
+  Iterators.Arguments = Iterators.Array;
+  addToUnscopables('keys');
+  addToUnscopables('values');
+  addToUnscopables('entries');
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/web.dom.iterable.js", ["npm:core-js@1.2.7/library/modules/es6.array.iterator.js", "npm:core-js@1.2.7/library/modules/$.iterators.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  $__require('npm:core-js@1.2.7/library/modules/es6.array.iterator.js');
+  var Iterators = $__require('npm:core-js@1.2.7/library/modules/$.iterators.js');
+  Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.to-integer.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var ceil = Math.ceil,
+      floor = Math.floor;
+  module.exports = function(it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.defined.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = function(it) {
+    if (it == undefined)
+      throw TypeError("Can't call method on  " + it);
+    return it;
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.string-at.js", ["npm:core-js@1.2.7/library/modules/$.to-integer.js", "npm:core-js@1.2.7/library/modules/$.defined.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var toInteger = $__require('npm:core-js@1.2.7/library/modules/$.to-integer.js'),
+      defined = $__require('npm:core-js@1.2.7/library/modules/$.defined.js');
+  module.exports = function(TO_STRING) {
+    return function(that, pos) {
+      var s = String(defined(that)),
+          i = toInteger(pos),
+          l = s.length,
+          a,
+          b;
+      if (i < 0 || i >= l)
+        return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.library.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = true;
   return module.exports;
 });
 
@@ -117,6 +487,125 @@ System.registerDynamic("npm:core-js@1.2.7/library/modules/$.export.js", ["npm:co
   return module.exports;
 });
 
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.redefine.js", ["npm:core-js@1.2.7/library/modules/$.hide.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.hide.js');
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.property-desc.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = function(bitmap, value) {
+    return {
+      enumerable: !(bitmap & 1),
+      configurable: !(bitmap & 2),
+      writable: !(bitmap & 4),
+      value: value
+    };
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.fails.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = function(exec) {
+    try {
+      return !!exec();
+    } catch (e) {
+      return true;
+    }
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.descriptors.js", ["npm:core-js@1.2.7/library/modules/$.fails.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = !$__require('npm:core-js@1.2.7/library/modules/$.fails.js')(function() {
+    return Object.defineProperty({}, 'a', {get: function() {
+        return 7;
+      }}).a != 7;
+  });
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.hide.js", ["npm:core-js@1.2.7/library/modules/$.js", "npm:core-js@1.2.7/library/modules/$.property-desc.js", "npm:core-js@1.2.7/library/modules/$.descriptors.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var $ = $__require('npm:core-js@1.2.7/library/modules/$.js'),
+      createDesc = $__require('npm:core-js@1.2.7/library/modules/$.property-desc.js');
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.descriptors.js') ? function(object, key, value) {
+    return $.setDesc(object, key, createDesc(1, value));
+  } : function(object, key, value) {
+    object[key] = value;
+    return object;
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.iter-create.js", ["npm:core-js@1.2.7/library/modules/$.js", "npm:core-js@1.2.7/library/modules/$.property-desc.js", "npm:core-js@1.2.7/library/modules/$.set-to-string-tag.js", "npm:core-js@1.2.7/library/modules/$.hide.js", "npm:core-js@1.2.7/library/modules/$.wks.js"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var $ = $__require('npm:core-js@1.2.7/library/modules/$.js'),
+      descriptor = $__require('npm:core-js@1.2.7/library/modules/$.property-desc.js'),
+      setToStringTag = $__require('npm:core-js@1.2.7/library/modules/$.set-to-string-tag.js'),
+      IteratorPrototype = {};
+  $__require('npm:core-js@1.2.7/library/modules/$.hide.js')(IteratorPrototype, $__require('npm:core-js@1.2.7/library/modules/$.wks.js')('iterator'), function() {
+    return this;
+  });
+  module.exports = function(Constructor, NAME, next) {
+    Constructor.prototype = $.create(IteratorPrototype, {next: descriptor(1, next)});
+    setToStringTag(Constructor, NAME + ' Iterator');
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.has.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var hasOwnProperty = {}.hasOwnProperty;
+  module.exports = function(it, key) {
+    return hasOwnProperty.call(it, key);
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.set-to-string-tag.js", ["npm:core-js@1.2.7/library/modules/$.js", "npm:core-js@1.2.7/library/modules/$.has.js", "npm:core-js@1.2.7/library/modules/$.wks.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var def = $__require('npm:core-js@1.2.7/library/modules/$.js').setDesc,
+      has = $__require('npm:core-js@1.2.7/library/modules/$.has.js'),
+      TAG = $__require('npm:core-js@1.2.7/library/modules/$.wks.js')('toStringTag');
+  module.exports = function(it, tag, stat) {
+    if (it && !has(it = stat ? it : it.prototype, TAG))
+      def(it, TAG, {
+        configurable: true,
+        value: tag
+      });
+  };
+  return module.exports;
+});
+
 System.registerDynamic("npm:core-js@1.2.7/library/modules/$.js", [], true, function($__require, exports, module) {
   ;
   var define,
@@ -138,27 +627,142 @@ System.registerDynamic("npm:core-js@1.2.7/library/modules/$.js", [], true, funct
   return module.exports;
 });
 
-System.registerDynamic("npm:core-js@1.2.7/library/modules/$.defined.js", [], true, function($__require, exports, module) {
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.iter-define.js", ["npm:core-js@1.2.7/library/modules/$.library.js", "npm:core-js@1.2.7/library/modules/$.export.js", "npm:core-js@1.2.7/library/modules/$.redefine.js", "npm:core-js@1.2.7/library/modules/$.hide.js", "npm:core-js@1.2.7/library/modules/$.has.js", "npm:core-js@1.2.7/library/modules/$.iterators.js", "npm:core-js@1.2.7/library/modules/$.iter-create.js", "npm:core-js@1.2.7/library/modules/$.set-to-string-tag.js", "npm:core-js@1.2.7/library/modules/$.js", "npm:core-js@1.2.7/library/modules/$.wks.js"], true, function($__require, exports, module) {
+  "use strict";
   ;
   var define,
       global = this,
       GLOBAL = this;
-  module.exports = function(it) {
-    if (it == undefined)
-      throw TypeError("Can't call method on  " + it);
-    return it;
+  var LIBRARY = $__require('npm:core-js@1.2.7/library/modules/$.library.js'),
+      $export = $__require('npm:core-js@1.2.7/library/modules/$.export.js'),
+      redefine = $__require('npm:core-js@1.2.7/library/modules/$.redefine.js'),
+      hide = $__require('npm:core-js@1.2.7/library/modules/$.hide.js'),
+      has = $__require('npm:core-js@1.2.7/library/modules/$.has.js'),
+      Iterators = $__require('npm:core-js@1.2.7/library/modules/$.iterators.js'),
+      $iterCreate = $__require('npm:core-js@1.2.7/library/modules/$.iter-create.js'),
+      setToStringTag = $__require('npm:core-js@1.2.7/library/modules/$.set-to-string-tag.js'),
+      getProto = $__require('npm:core-js@1.2.7/library/modules/$.js').getProto,
+      ITERATOR = $__require('npm:core-js@1.2.7/library/modules/$.wks.js')('iterator'),
+      BUGGY = !([].keys && 'next' in [].keys()),
+      FF_ITERATOR = '@@iterator',
+      KEYS = 'keys',
+      VALUES = 'values';
+  var returnThis = function() {
+    return this;
+  };
+  module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
+    $iterCreate(Constructor, NAME, next);
+    var getMethod = function(kind) {
+      if (!BUGGY && kind in proto)
+        return proto[kind];
+      switch (kind) {
+        case KEYS:
+          return function keys() {
+            return new Constructor(this, kind);
+          };
+        case VALUES:
+          return function values() {
+            return new Constructor(this, kind);
+          };
+      }
+      return function entries() {
+        return new Constructor(this, kind);
+      };
+    };
+    var TAG = NAME + ' Iterator',
+        DEF_VALUES = DEFAULT == VALUES,
+        VALUES_BUG = false,
+        proto = Base.prototype,
+        $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT],
+        $default = $native || getMethod(DEFAULT),
+        methods,
+        key;
+    if ($native) {
+      var IteratorPrototype = getProto($default.call(new Base));
+      setToStringTag(IteratorPrototype, TAG, true);
+      if (!LIBRARY && has(proto, FF_ITERATOR))
+        hide(IteratorPrototype, ITERATOR, returnThis);
+      if (DEF_VALUES && $native.name !== VALUES) {
+        VALUES_BUG = true;
+        $default = function values() {
+          return $native.call(this);
+        };
+      }
+    }
+    if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+      hide(proto, ITERATOR, $default);
+    }
+    Iterators[NAME] = $default;
+    Iterators[TAG] = returnThis;
+    if (DEFAULT) {
+      methods = {
+        values: DEF_VALUES ? $default : getMethod(VALUES),
+        keys: IS_SET ? $default : getMethod(KEYS),
+        entries: !DEF_VALUES ? $default : getMethod('entries')
+      };
+      if (FORCED)
+        for (key in methods) {
+          if (!(key in proto))
+            redefine(proto, key, methods[key]);
+        }
+      else
+        $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
+    }
+    return methods;
   };
   return module.exports;
 });
 
-System.registerDynamic("npm:core-js@1.2.7/library/modules/$.to-object.js", ["npm:core-js@1.2.7/library/modules/$.defined.js"], true, function($__require, exports, module) {
+System.registerDynamic("npm:core-js@1.2.7/library/modules/es6.string.iterator.js", ["npm:core-js@1.2.7/library/modules/$.string-at.js", "npm:core-js@1.2.7/library/modules/$.iter-define.js"], true, function($__require, exports, module) {
+  "use strict";
   ;
   var define,
       global = this,
       GLOBAL = this;
-  var defined = $__require('npm:core-js@1.2.7/library/modules/$.defined.js');
+  var $at = $__require('npm:core-js@1.2.7/library/modules/$.string-at.js')(true);
+  $__require('npm:core-js@1.2.7/library/modules/$.iter-define.js')(String, 'String', function(iterated) {
+    this._t = String(iterated);
+    this._i = 0;
+  }, function() {
+    var O = this._t,
+        index = this._i,
+        point;
+    if (index >= O.length)
+      return {
+        value: undefined,
+        done: true
+      };
+    point = $at(O, index);
+    this._i += point.length;
+    return {
+      value: point,
+      done: false
+    };
+  });
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.is-object.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
   module.exports = function(it) {
-    return Object(defined(it));
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.an-object.js", ["npm:core-js@1.2.7/library/modules/$.is-object.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var isObject = $__require('npm:core-js@1.2.7/library/modules/$.is-object.js');
+  module.exports = function(it) {
+    if (!isObject(it))
+      throw TypeError(it + ' is not an object!');
+    return it;
   };
   return module.exports;
 });
@@ -175,82 +779,98 @@ System.registerDynamic("npm:core-js@1.2.7/library/modules/$.cof.js", [], true, f
   return module.exports;
 });
 
-System.registerDynamic("npm:core-js@1.2.7/library/modules/$.iobject.js", ["npm:core-js@1.2.7/library/modules/$.cof.js"], true, function($__require, exports, module) {
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.classof.js", ["npm:core-js@1.2.7/library/modules/$.cof.js", "npm:core-js@1.2.7/library/modules/$.wks.js"], true, function($__require, exports, module) {
   ;
   var define,
       global = this,
       GLOBAL = this;
-  var cof = $__require('npm:core-js@1.2.7/library/modules/$.cof.js');
-  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
-    return cof(it) == 'String' ? it.split('') : Object(it);
+  var cof = $__require('npm:core-js@1.2.7/library/modules/$.cof.js'),
+      TAG = $__require('npm:core-js@1.2.7/library/modules/$.wks.js')('toStringTag'),
+      ARG = cof(function() {
+        return arguments;
+      }()) == 'Arguments';
+  module.exports = function(it) {
+    var O,
+        T,
+        B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
   };
   return module.exports;
 });
 
-System.registerDynamic("npm:core-js@1.2.7/library/modules/$.fails.js", [], true, function($__require, exports, module) {
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.shared.js", ["npm:core-js@1.2.7/library/modules/$.global.js"], true, function($__require, exports, module) {
   ;
   var define,
       global = this,
       GLOBAL = this;
-  module.exports = function(exec) {
-    try {
-      return !!exec();
-    } catch (e) {
-      return true;
-    }
+  var global = $__require('npm:core-js@1.2.7/library/modules/$.global.js'),
+      SHARED = '__core-js_shared__',
+      store = global[SHARED] || (global[SHARED] = {});
+  module.exports = function(key) {
+    return store[key] || (store[key] = {});
   };
   return module.exports;
 });
 
-System.registerDynamic("npm:core-js@1.2.7/library/modules/$.object-assign.js", ["npm:core-js@1.2.7/library/modules/$.js", "npm:core-js@1.2.7/library/modules/$.to-object.js", "npm:core-js@1.2.7/library/modules/$.iobject.js", "npm:core-js@1.2.7/library/modules/$.fails.js"], true, function($__require, exports, module) {
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.uid.js", [], true, function($__require, exports, module) {
   ;
   var define,
       global = this,
       GLOBAL = this;
-  var $ = $__require('npm:core-js@1.2.7/library/modules/$.js'),
-      toObject = $__require('npm:core-js@1.2.7/library/modules/$.to-object.js'),
-      IObject = $__require('npm:core-js@1.2.7/library/modules/$.iobject.js');
-  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.fails.js')(function() {
-    var a = Object.assign,
-        A = {},
-        B = {},
-        S = Symbol(),
-        K = 'abcdefghijklmnopqrst';
-    A[S] = 7;
-    K.split('').forEach(function(k) {
-      B[k] = k;
-    });
-    return a({}, A)[S] != 7 || Object.keys(a({}, B)).join('') != K;
-  }) ? function assign(target, source) {
-    var T = toObject(target),
-        $$ = arguments,
-        $$len = $$.length,
-        index = 1,
-        getKeys = $.getKeys,
-        getSymbols = $.getSymbols,
-        isEnum = $.isEnum;
-    while ($$len > index) {
-      var S = IObject($$[index++]),
-          keys = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S),
-          length = keys.length,
-          j = 0,
-          key;
-      while (length > j)
-        if (isEnum.call(S, key = keys[j++]))
-          T[key] = S[key];
-    }
-    return T;
-  } : Object.assign;
+  var id = 0,
+      px = Math.random();
+  module.exports = function(key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+  };
   return module.exports;
 });
 
-System.registerDynamic("npm:core-js@1.2.7/library/modules/es6.object.assign.js", ["npm:core-js@1.2.7/library/modules/$.export.js", "npm:core-js@1.2.7/library/modules/$.object-assign.js"], true, function($__require, exports, module) {
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.global.js", [], true, function($__require, exports, module) {
   ;
   var define,
       global = this,
       GLOBAL = this;
-  var $export = $__require('npm:core-js@1.2.7/library/modules/$.export.js');
-  $export($export.S + $export.F, 'Object', {assign: $__require('npm:core-js@1.2.7/library/modules/$.object-assign.js')});
+  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+  if (typeof __g == 'number')
+    __g = global;
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.wks.js", ["npm:core-js@1.2.7/library/modules/$.shared.js", "npm:core-js@1.2.7/library/modules/$.uid.js", "npm:core-js@1.2.7/library/modules/$.global.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var store = $__require('npm:core-js@1.2.7/library/modules/$.shared.js')('wks'),
+      uid = $__require('npm:core-js@1.2.7/library/modules/$.uid.js'),
+      Symbol = $__require('npm:core-js@1.2.7/library/modules/$.global.js').Symbol;
+  module.exports = function(name) {
+    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
+  };
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/$.iterators.js", [], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  module.exports = {};
+  return module.exports;
+});
+
+System.registerDynamic("npm:core-js@1.2.7/library/modules/core.get-iterator-method.js", ["npm:core-js@1.2.7/library/modules/$.classof.js", "npm:core-js@1.2.7/library/modules/$.wks.js", "npm:core-js@1.2.7/library/modules/$.iterators.js", "npm:core-js@1.2.7/library/modules/$.core.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  var classof = $__require('npm:core-js@1.2.7/library/modules/$.classof.js'),
+      ITERATOR = $__require('npm:core-js@1.2.7/library/modules/$.wks.js')('iterator'),
+      Iterators = $__require('npm:core-js@1.2.7/library/modules/$.iterators.js');
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.core.js').getIteratorMethod = function(it) {
+    if (it != undefined)
+      return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
+  };
   return module.exports;
 });
 
@@ -265,23 +885,40 @@ System.registerDynamic("npm:core-js@1.2.7/library/modules/$.core.js", [], true, 
   return module.exports;
 });
 
-System.registerDynamic("npm:core-js@1.2.7/library/fn/object/assign.js", ["npm:core-js@1.2.7/library/modules/es6.object.assign.js", "npm:core-js@1.2.7/library/modules/$.core.js"], true, function($__require, exports, module) {
+System.registerDynamic("npm:core-js@1.2.7/library/modules/core.get-iterator.js", ["npm:core-js@1.2.7/library/modules/$.an-object.js", "npm:core-js@1.2.7/library/modules/core.get-iterator-method.js", "npm:core-js@1.2.7/library/modules/$.core.js"], true, function($__require, exports, module) {
   ;
   var define,
       global = this,
       GLOBAL = this;
-  $__require('npm:core-js@1.2.7/library/modules/es6.object.assign.js');
-  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.core.js').Object.assign;
+  var anObject = $__require('npm:core-js@1.2.7/library/modules/$.an-object.js'),
+      get = $__require('npm:core-js@1.2.7/library/modules/core.get-iterator-method.js');
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/$.core.js').getIterator = function(it) {
+    var iterFn = get(it);
+    if (typeof iterFn != 'function')
+      throw TypeError(it + ' is not iterable!');
+    return anObject(iterFn.call(it));
+  };
   return module.exports;
 });
 
-System.registerDynamic("npm:babel-runtime@5.8.38/core-js/object/assign.js", ["npm:core-js@1.2.7/library/fn/object/assign.js"], true, function($__require, exports, module) {
+System.registerDynamic("npm:core-js@1.2.7/library/fn/get-iterator.js", ["npm:core-js@1.2.7/library/modules/web.dom.iterable.js", "npm:core-js@1.2.7/library/modules/es6.string.iterator.js", "npm:core-js@1.2.7/library/modules/core.get-iterator.js"], true, function($__require, exports, module) {
+  ;
+  var define,
+      global = this,
+      GLOBAL = this;
+  $__require('npm:core-js@1.2.7/library/modules/web.dom.iterable.js');
+  $__require('npm:core-js@1.2.7/library/modules/es6.string.iterator.js');
+  module.exports = $__require('npm:core-js@1.2.7/library/modules/core.get-iterator.js');
+  return module.exports;
+});
+
+System.registerDynamic("npm:babel-runtime@5.8.38/core-js/get-iterator.js", ["npm:core-js@1.2.7/library/fn/get-iterator.js"], true, function($__require, exports, module) {
   ;
   var define,
       global = this,
       GLOBAL = this;
   module.exports = {
-    "default": $__require('npm:core-js@1.2.7/library/fn/object/assign.js'),
+    "default": $__require('npm:core-js@1.2.7/library/fn/get-iterator.js'),
     __esModule: true
   };
   return module.exports;
@@ -95774,142 +96411,87 @@ System.registerDynamic("github:photonstorm/phaser@2.6.1.js", ["github:photonstor
   return module.exports;
 });
 
-System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-check.js', 'npm:babel-runtime@5.8.38/core-js/object/assign.js', 'github:photonstorm/phaser@2.6.1.js'], function (_export) {
-	var _classCallCheck, _Object$assign, Phaser, fieldSize, fieldBounds, SpikeImpactGame;
+System.register('js/virtkb.js', ['npm:babel-runtime@5.8.38/core-js/get-iterator.js', 'github:photonstorm/phaser@2.6.1.js'], function (_export) {
+	var _getIterator, Phaser, keyboard, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, bindPhaser;
 
 	return {
-		setters: [function (_npmBabelRuntime5838HelpersClassCallCheckJs) {
-			_classCallCheck = _npmBabelRuntime5838HelpersClassCallCheckJs['default'];
-		}, function (_npmBabelRuntime5838CoreJsObjectAssignJs) {
-			_Object$assign = _npmBabelRuntime5838CoreJsObjectAssignJs['default'];
+		setters: [function (_npmBabelRuntime5838CoreJsGetIteratorJs) {
+			_getIterator = _npmBabelRuntime5838CoreJsGetIteratorJs['default'];
 		}, function (_githubPhotonstormPhaser261Js) {
 			Phaser = _githubPhotonstormPhaser261Js['default'];
 		}],
 		execute: function () {
 			'use strict';
 
-			fieldSize = {
-				WIDTH: 320,
-				HEIGHT: 200
-			};
-			fieldBounds = {
-				LEFT: 0,
-				RIGHT: 319,
-				UP: 12,
-				BOTTOM: 199
-			};
+			keyboard = null;
 
-			SpikeImpactGame = function SpikeImpactGame() {
-				var _this = this;
+			if ('ontouchstart' in window) {
+				(function () {
+					var touchKeys = document.getElementById('touchKeys');
+					touchKeys.style.display = 'block';
 
-				_classCallCheck(this, SpikeImpactGame);
+					var classMappings = {
+						up: Phaser.KeyCode.UP,
+						down: Phaser.KeyCode.DOWN,
+						onus: Phaser.KeyCode.TAB,
+						left: Phaser.KeyCode.LEFT,
+						right: Phaser.KeyCode.RIGHT,
+						shoot: Phaser.KeyCode.SPACEBAR
+					};
 
-				this.preload = function (game) {
-					game.load.atlas('lvl1', 'img/sprite1.gif', 'img/sprite1.json');
-				};
+					var kbHandler = function kbHandler(e) {
+						var keyCode = 0;
+						for (var className in classMappings) {
+							if (e.target.classList.contains(className)) {
+								keyCode = classMappings[className];
+								break;
+							}
+						}keyboard[e.type == 'touchstart' ? 'processKeyDown' : 'processKeyUp']({
+							keyCode: keyCode,
+							preventDefault: function preventDefault() {}
+						});
 
-				this.initLvl1 = function (game) {
-					window.addEventListener('resize', _this._onResize);
-					_this._onResize();
+						e.type == 'touchstart' ? e.target.classList.add('active') : e.target.classList.remove('active');
 
-					game.stage.backgroundColor = '#b0e7e7';
-					game.stage.smoothed = false;
+						e.preventDefault();
+					};
 
-					_this.scrolls = game.add.weapon(40, 'lvl1', 'scroll');
-					_this.scrolls.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-					_this.scrolls.bulletSpeed = 50;
-					_this.scrolls.fireRate = 10;
-					_this.scrolls.fireAngle = 0;
+					_iteratorNormalCompletion = true;
+					_didIteratorError = false;
+					_iteratorError = undefined;
 
-					_this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy');
+					try {
+						for (_iterator = _getIterator(document.querySelectorAll('#touchKeys .block > *')); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+							var key = _step.value;
 
-					_this.spike = game.add.sprite(15, 0, 'lvl1', 'dummy');
-
-					_this.spikePaw = game.add.sprite(1, 3, 'lvl1', 'dummy');
-					_this.spikeBody = game.add.sprite(0, 0, 'lvl1', 'spikeBody00');
-					_this.spike.addChild(_this.spikePaw);
-					_this.spike.addChild(_this.spikeBody);
-					_this.scrolls.trackSprite(_this.spike, 13, 5);
-
-					_this.twilightBody = game.add.sprite(0, 0, 'lvl1', 'twilightBody');
-					_this.twilightWing = game.add.sprite(9, 18, 'lvl1', 'twilightWing');
-
-					_this.twilightWing.anchor.setTo(0, 1);
-					_this.game.time.events.loop(Phaser.Timer.SECOND * 0.4, function () {
-						return _this.twilightWing.scale.y = -_this.twilightWing.scale.y;
-					});
-
-					_this.twilight.addChild(_this.twilightBody);
-					_this.twilight.addChild(_this.spike);
-					_this.twilight.addChild(_this.twilightWing);
-
-					_this.spikePaw.animations.add('throw', Phaser.Animation.generateFrameNames('spikePaw', 0, 2, '', 2).concat('dummy'), 10).onComplete.add(function () {
-						return _this.scrolls.fire();
-					});
-
-					_this.input = _Object$assign(game.input.keyboard.createCursorKeys(), {
-						space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
-						enter: game.input.keyboard.addKey(Phaser.KeyCode.ENTER),
-						w: game.input.keyboard.addKey(Phaser.KeyCode.W),
-						a: game.input.keyboard.addKey(Phaser.KeyCode.A),
-						s: game.input.keyboard.addKey(Phaser.KeyCode.S),
-						d: game.input.keyboard.addKey(Phaser.KeyCode.D)
-					});
-
-					document.querySelector('#viewport .loader').style.display = 'none';
-				};
-
-				this.update = function (game) {
-					if (_this.input.up.isDown || _this.input.w.isDown) {
-						_this.twilightWing.scale.y = -1;
-						_this._setIf(function (y) {
-							return y -= 4;
-						}, function (y) {
-							return y > fieldBounds.UP;
-						}, _this.twilight.position, 'y');
-					} else if (_this.input.down.isDown || _this.input.s.isDown) {
-						_this.twilightWing.scale.y = 1;
-						_this._setIf(function (y) {
-							return y += 4;
-						}, function (y) {
-							return y < fieldBounds.BOTTOM - 19;
-						}, _this.twilight.position, 'y');
-					} else if (_this.input.left.isDown || _this.input.a.isDown) {
-						_this._setIf(function (x) {
-							return x -= 4;
-						}, function (x) {
-							return x > fieldBounds.LEFT;
-						}, _this.twilight.position, 'x');
-					} else if (_this.input.right.isDown || _this.input.d.isDown) {
-						_this._setIf(function (x) {
-							return x += 4;
-						}, function (x) {
-							return x < fieldBounds.RIGHT - 30;
-						}, _this.twilight.position, 'x');
-					} else if (_this.input.space.isDown || _this.input.enter.isDown) {
-						_this.spikePaw.animations.play('throw');
+							key.addEventListener('touchstart', kbHandler);
+							key.addEventListener('touchend', kbHandler);
+							key.addEventListener('dblclick', function (e) {
+								return e.preventDefault();
+							});
+						}
+					} catch (err) {
+						_didIteratorError = true;
+						_iteratorError = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion && _iterator['return']) {
+								_iterator['return']();
+							}
+						} finally {
+							if (_didIteratorError) {
+								throw _iteratorError;
+							}
+						}
 					}
-				};
+				})();
+			}
 
-				this._setIf = function (action, predicate, object, property) {
-					var updated = action(object[property]);
-					if (predicate(updated)) object[property] = updated;
-				};
-
-				this._onResize = function () {
-					var scaleFactor = Math.min(window.innerWidth / fieldSize.WIDTH, window.innerHeight / fieldSize.HEIGHT) | 0;
-					_this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
-					_this.game.scale.setUserScale(scaleFactor, scaleFactor, 0, 0);
-				};
-
-				this.game = new Phaser.Game(fieldSize.WIDTH, fieldSize.HEIGHT, Phaser.AUTO, document.getElementById('viewport'), {
-					create: this.initLvl1,
-					preload: this.preload,
-					update: this.update
-				}, false, false);
+			bindPhaser = function bindPhaser(game) {
+				keyboard = game.input.keyboard;
 			};
 
-			_export('default', new SpikeImpactGame());
+			_export('default', bindPhaser);
 		}
 	};
 });
