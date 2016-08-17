@@ -172,10 +172,6 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 						return _this.scrolls.fire();
 					});
 
-					_this.game.time.events.loop(Phaser.Timer.SECOND * 0.4, function () {
-						return game.world.rotation++;
-					});
-
 					_this.input = _Object$assign(game.input.keyboard.createCursorKeys(), {
 						space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
 						enter: game.input.keyboard.addKey(Phaser.KeyCode.ENTER),
