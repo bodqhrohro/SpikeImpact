@@ -49,7 +49,10 @@
 	<script>
 		System.import('js/game.js').then(function(game) {
 			System.import('js/virtkb.js').then(function(virtkb) {
-				virtkb.default(game.default.game)
+				var phaserGame = game.default.game
+				phaserGame.device.whenReady(function() {
+					virtkb.default(phaserGame)
+				})
 			})
 		})
 	</script>
