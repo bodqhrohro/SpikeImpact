@@ -31,13 +31,14 @@ class SpikeImpactGame {
 
 	preload = (game) => {
 		game.load.atlas('lvl1', 'img/sprite1.gif', 'img/sprite1.json')
+		game.load.audio('bgmusic', 'snd/bgmusic.ogg')
 	}
 
 	initLvl1 = (game) => {
 		window.addEventListener('resize', this._onResize)
 		this._onResize()
 
-		game.stage.backgroundColor = '#b0e7e7'
+		game.stage.backgroundColor = '#587373'
 		game.stage.smoothed = false
 
 		this.scrolls = []
@@ -75,6 +76,8 @@ class SpikeImpactGame {
 			s: game.input.keyboard.addKey(Phaser.KeyCode.S),
 			d: game.input.keyboard.addKey(Phaser.KeyCode.D)
 		})
+
+		game.add.sound('bgmusic', 1, true).play()
 
 		document.querySelector('#viewport .loader').style.display = 'none'
 	}

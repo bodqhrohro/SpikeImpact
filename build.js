@@ -131,13 +131,14 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 
 				this.preload = function (game) {
 					game.load.atlas('lvl1', 'img/sprite1.gif', 'img/sprite1.json');
+					game.load.audio('bgmusic', 'snd/bgmusic.ogg');
 				};
 
 				this.initLvl1 = function (game) {
 					window.addEventListener('resize', _this._onResize);
 					_this._onResize();
 
-					game.stage.backgroundColor = '#b0e7e7';
+					game.stage.backgroundColor = '#587373';
 					game.stage.smoothed = false;
 
 					_this.scrolls = [];
@@ -173,6 +174,8 @@ System.register('js/game.js', ['npm:babel-runtime@5.8.38/helpers/class-call-chec
 						s: game.input.keyboard.addKey(Phaser.KeyCode.S),
 						d: game.input.keyboard.addKey(Phaser.KeyCode.D)
 					});
+
+					game.add.sound('bgmusic', 1, true).play();
 
 					document.querySelector('#viewport .loader').style.display = 'none';
 				};
