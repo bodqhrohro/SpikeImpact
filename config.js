@@ -58,6 +58,7 @@ System.config({
       "npm:core-js@1.2.7/library/modules/$.iter-step.js",
       "npm:core-js@1.2.7/library/modules/$.add-to-unscopables.js",
       "js/game.js",
+      "js/world.js",
       "npm:babel-runtime@5.8.38/core-js/object/assign.js",
       "npm:core-js@1.2.7/library/fn/object/assign.js",
       "npm:core-js@1.2.7/library/modules/es6.object.assign.js",

@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import world from './world'
 
 const fieldSize = {
 	WIDTH: 320,
@@ -41,6 +42,8 @@ class SpikeImpactGame {
 		game.stage.backgroundColor = '#587373'
 		game.stage.smoothed = false
 
+		game.world.setBounds(0, 0, 1000, fieldSize.HEIGHT)
+
 		this.scrolls = []
 
 		this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy')
@@ -61,12 +64,22 @@ class SpikeImpactGame {
 		this.twilight.addChild(this.twilightBody)
 		this.twilight.addChild(this.spike)
 		this.twilight.addChild(this.twilightWing)
+		this.twilight.fixedToCamera = true
 
 		this.spikePaw.animations.add(
 			'throw',
 			Phaser.Animation.generateFrameNames('spikePaw', 0, 2, '', 2).concat('dummy'),
 			10
 		).onComplete.add(this.createBullet)
+
+		this.strawberryBats = game.add.group()
+		world.lvl1.strawberryBats.forEach((coords) => {
+			let bat = this.strawberryBats.create(coords.x, coords.y, 'lvl1', 'strawberryBat00')
+			bat.animations.add('strawberryBatFly', Phaser.Animation.generateFrameNames('strawberryBat', 0, 1, '', 2))
+			bat.animations.play('strawberryBatFly', 2, true)
+		})
+
+		this.game.time.events.loop(Phaser.Timer.SECOND * 0.1, () => game.camera.x++)
 
 		this.input = Object.assign(game.input.keyboard.createCursorKeys(), {
 			space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
@@ -85,14 +98,14 @@ class SpikeImpactGame {
 	update = (game) => {
 		if (this.input.up.isDown || this.input.w.isDown) {
 			this.twilightWing.scale.y = -1
-			this._setIf((y) => y-=4, (y) => y > fieldBounds.UP, this.twilight.position, 'y')
+			this._setIf((y) => y-=4, (y) => y > fieldBounds.UP, this.twilight.cameraOffset, 'y')
 		} else if (this.input.down.isDown || this.input.s.isDown) {
 			this.twilightWing.scale.y = 1
-			this._setIf((y) => y+=4, (y) => y < fieldBounds.BOTTOM - 19, this.twilight.position, 'y')
+			this._setIf((y) => y+=4, (y) => y < fieldBounds.BOTTOM - 19, this.twilight.cameraOffset, 'y')
 		} else if (this.input.left.isDown || this.input.a.isDown) {
-			this._setIf((x) => x-=4, (x) => x > fieldBounds.LEFT, this.twilight.position, 'x')
+			this._setIf((x) => x-=4, (x) => x > fieldBounds.LEFT, this.twilight.cameraOffset, 'x')
 		} else if (this.input.right.isDown || this.input.d.isDown) {
-			this._setIf((x) => x+=4, (x) => x < fieldBounds.RIGHT - 30, this.twilight.position, 'x')
+			this._setIf((x) => x+=4, (x) => x < fieldBounds.RIGHT - 30, this.twilight.cameraOffset, 'x')
 		} else if (this.input.space.isDown || this.input.enter.isDown) {
 			this.spikePaw.animations.play('throw')
 		}
@@ -108,8 +121,8 @@ class SpikeImpactGame {
 		let bullet = new Phaser.Sprite(this.game, this.spike.world.x + 13, this.spike.world.y + 4, 'lvl1', 'scroll')
 		this.game.world.addChildAt(bullet, 0)
 		var timer = this.game.time.events.loop(
-			Phaser.Timer.SECOND * 0.05,
-			() => bullet.position.x < fieldBounds.RIGHT
+			Phaser.Timer.SECOND * 0.03,
+			() => bullet.position.x - this.game.camera.x < fieldBounds.RIGHT
 				? bullet.position.x++
 				: (
 					bullet.destroy()
