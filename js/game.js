@@ -61,7 +61,6 @@ class SpikeImpactGame {
 			this.add = (delta) => {
 				this.count += delta
 				setText(Phaser.Animation.generateFrameNames('', this.count, this.count, '', 5)[0])
-
 			}
 		}
 
@@ -95,12 +94,8 @@ class SpikeImpactGame {
 
 		this.mobs = new Map()
 		for (let mobType in world.lvl1) {
-			this.mobs.set(mobType, game.add.group())
-			world.lvl1[mobType].forEach((coords) => {
-				let mob = this.mobs.get(mobType).create(coords.x, coords.y, 'lvl1', mobType + '00')
-				mob.animations.add(mobType + 'Fly', Phaser.Animation.generateFrameNames(mobType, 0, 1, '', 2))
-				mob.animations.play(mobType + 'Fly', 2, true)
-			})
+			this.mobs.set(mobType, game.add.group(undefined, mobType))
+			world.lvl1[mobType].coords.forEach((coords) => this.spawnMob(mobType, coords))
 		}
 		game.physics.arcade.enable([...this.mobs.values()])
 
@@ -136,14 +131,28 @@ class SpikeImpactGame {
 		}
 
 		for (let [mobType, mobGroup] of this.mobs) {
-			game.physics.arcade.collide(mobGroup, this.scrolls, (obj1, obj2) => {
-				obj1.kill()
-				obj2.kill()
-				this.score.add(
-					mobType == 'strawberryBat' ? 5 :
-					!mobType.indexOf('parasprite') ? 7 :
-					0
-				)
+			game.physics.arcade.collide(mobGroup, this.scrolls, (mob, scroll) => {
+				if (mob.health > 1) {
+					mob.damage(1)
+					if (!mobType.indexOf('parasprite')) {
+						game.time.events.add(
+							Phaser.Timer.SECOND * 2,
+							() => {
+								if (mob.alive) {
+									game.physics.arcade.enable([
+										this.spawnMob(mob.parent.name, { x: mob.x, y: mob.y-10 }),
+										this.spawnMob(mob.parent.name, { x: mob.x, y: mob.y+10 })
+									])
+									mob.destroy()
+								}
+							}
+						)
+					}
+				} else {
+					mob.kill()
+					this.score.add(world.lvl1[mobType].score)
+				}
+				scroll.kill()
 			}, null, this)
 		}
 	}
@@ -176,6 +185,14 @@ class SpikeImpactGame {
 		let scaleFactor = Math.min(window.innerWidth/fieldSize.WIDTH, window.innerHeight/fieldSize.HEIGHT)|0
 		this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE
 		this.game.scale.setUserScale(scaleFactor, scaleFactor, 0, 0)
+	}
+
+	spawnMob = (mobType, coords) => {
+		let mob = this.mobs.get(mobType).create(coords.x, coords.y, 'lvl1', mobType + '00')
+		mob.health = world.lvl1[mobType].health
+		mob.animations.add(mobType + 'Fly', Phaser.Animation.generateFrameNames(mobType, 0, 1, '', 2))
+		mob.animations.play(mobType + 'Fly', 2, true)
+		return mob
 	}
 }
 
