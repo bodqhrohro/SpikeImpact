@@ -144,5 +144,21 @@
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 10 },
 			"sourceSize": { "w": 11, "h": 10 }
 		}
+		,{
+			"filename": "changeling00",
+			"frame": { "x": 110, "y": 1, "w": 27, "h": 25 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 27, "h": 25 },
+			"sourceSize": { "w": 11, "h": 10 }
+		}
+		,{
+			"filename": "changeling01",
+			"frame": { "x": 110, "y": 28, "w": 27, "h": 25 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 27, "h": 25 },
+			"sourceSize": { "w": 27, "h": 25 }
+		}
 	]
 }

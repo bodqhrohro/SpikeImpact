@@ -53,6 +53,15 @@ export default {
 			],
 			health: 2,
 			score: 7
+		},
+		'changeling': {
+			coords: [
+				{ x: 1310, y: 20   },
+				{ x: 1370, y: 160  },
+				{ x: 1400, y: 140  },
+			],
+			health: 7,
+			score: 30
 		}
 	}
 }
