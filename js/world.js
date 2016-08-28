@@ -62,6 +62,13 @@ export default {
 			],
 			health: 7,
 			score: 30
+		},
+		'tiret': {
+			coords: [
+				{ x: 1700, y: 20   },
+			],
+			health: 30,
+			score: 200
 		}
 	}
 }

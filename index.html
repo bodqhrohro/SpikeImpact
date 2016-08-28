@@ -60,6 +60,9 @@
 			spikeImpact.onGameOver = function() {
 				var gameOverDiv = document.querySelector('#viewport .gameover')
 
+				if (spikeImpact.win)
+					gameOverDiv.innerHTML = 'МЫ КУПИЛИ КЕРОСИН!'
+
 				if (localStorage) {
 					var highScore = localStorage.getItem('spikeImpactHighScore') |0
 					if (highScore < spikeImpact.score.count) {
@@ -70,7 +73,7 @@
 				}
 
 				var canvasStyle = document.querySelector('#viewport canvas').style
-				canvasStyle.webkitFilter = canvasStyle.filter = 'grayscale(.5)'
+				canvasStyle.webkitFilter = canvasStyle.filter = spikeImpact.win ? 'contrast(3)' : 'grayscale(.5)'
 
 				var gameOverStyle = gameOverDiv.style
 				gameOverStyle.height = canvasStyle.height

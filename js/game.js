@@ -45,9 +45,10 @@ class SpikeImpactGame {
 		game.stage.backgroundColor = '#587373'
 		game.stage.smoothed = false
 
-		game.world.setBounds(0, 0, 2000, fieldSize.HEIGHT)
+		game.world.setBounds(0, 0, 1800, fieldSize.HEIGHT)
 
 		this.gameOver = false
+		this.win = false
 
 		this.health = new (function(_this) {
 			var setText = (text) => text ? this.font.setText(text, false, 1) : this.font.clear()
@@ -184,11 +185,17 @@ class SpikeImpactGame {
 					}
 				} else {
 					this.killMob(mob)
+					if (mob.parent.name == 'tiret') {
+						this.gameOver = true
+						this.win = true
+						this.onGameOver()
+					}
 				}
 				scroll.kill()
 			}, null, this)
 			game.physics.arcade.collide(this.twilightBody, mobGroup, (twi, mob) => {
-				this.killMob(mob)
+				if (mob.parent.name != 'tiret')
+					this.killMob(mob)
 				this.health.damage()
 			})
 		}
@@ -204,7 +211,7 @@ class SpikeImpactGame {
 		let bullet = this.scrolls.create(this.spike.world.x + 13, this.spike.world.y + 4, 'lvl1', 'scroll')
 		this.game.physics.arcade.enable(bullet)
 
-		bullet.events.onKilled.add(() => removeTimer(), this)
+		bullet.events.onKilled.add(() => this._removeTimer(), this)
 
 		let timer = this.game.time.events.loop(
 			Phaser.Timer.SECOND / 60,
@@ -212,11 +219,12 @@ class SpikeImpactGame {
 				? bullet.position.x+=2
 				: (
 					bullet.destroy()
-				  ,	removeTimer()
+				  ,	this._removeTimer(timer)
 				)
 		)
-		let removeTimer = () => this.game.time.events.remove(timer)
 	}
+
+	_removeTimer = (timer) => this.game.time.events.remove(timer)
 
 	_onResize = () => {
 		let scaleFactor = Math.min(window.innerWidth/fieldSize.WIDTH, window.innerHeight/fieldSize.HEIGHT)|0
@@ -227,8 +235,27 @@ class SpikeImpactGame {
 	spawnMob = (mobType, coords) => {
 		let mob = this.mobs.get(mobType).create(coords.x, coords.y, 'lvl1', mobType + '00')
 		mob.health = world.lvl1[mobType].health
-		mob.animations.add(mobType + 'Fly', Phaser.Animation.generateFrameNames(mobType, 0, 1, '', 2))
-		mob.animations.play(mobType + 'Fly', 2, true)
+		if (mobType == 'tiret') {
+			let phase
+			let timer = this.game.time.events.loop(
+				Phaser.Timer.SECOND * 0.05,
+				() => {
+					if (!mob.alive) {
+						this._removeTimer(timer)
+						return
+					}
+					if (mob.y <=20) {
+						phase = 1
+					} else if (mob.y >=70) {
+						phase = -1
+					}
+					mob.y += phase
+				}
+			)
+		} else {
+			mob.animations.add(mobType + 'Fly', Phaser.Animation.generateFrameNames(mobType, 0, 1, '', 2))
+			mob.animations.play(mobType + 'Fly', 2, true)
+		}
 		return mob
 	}
 
