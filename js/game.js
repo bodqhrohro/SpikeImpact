@@ -45,7 +45,7 @@ class SpikeImpactGame {
 		game.stage.backgroundColor = '#587373'
 		game.stage.smoothed = false
 
-		game.world.setBounds(0, 0, 1000, fieldSize.HEIGHT)
+		game.world.setBounds(0, 0, 2000, fieldSize.HEIGHT)
 
 		this.score = new function() {
 			var setText = (text) => this.font.setText(text, false, 1)
@@ -53,14 +53,14 @@ class SpikeImpactGame {
 			this.count = 0
 
 			this.font = game.add.retroFont('scoreFont', 4, 7, '0123456789', 10, 1)
-			setText('0000')
+			setText('00000')
 
 			this.text = game.add.image(295, 1, this.font)
 			this.text.fixedToCamera = true
 
 			this.add = (delta) => {
 				this.count += delta
-				setText(Phaser.Animation.generateFrameNames('', this.count, this.count, '', 4)[0])
+				setText(Phaser.Animation.generateFrameNames('', this.count, this.count, '', 5)[0])
 
 			}
 		}
@@ -93,16 +93,18 @@ class SpikeImpactGame {
 			10
 		).onComplete.add(this.createBullet)
 
-		this.mobs = {}
-		this.mobs.strawberryBats = game.add.group()
-		world.lvl1.strawberryBats.forEach((coords) => {
-			let bat = this.mobs.strawberryBats.create(coords.x, coords.y, 'lvl1', 'strawberryBat00')
-			bat.animations.add('strawberryBatFly', Phaser.Animation.generateFrameNames('strawberryBat', 0, 1, '', 2))
-			bat.animations.play('strawberryBatFly', 2, true)
-		})
-		game.physics.arcade.enable(Object.values(this.mobs))
+		this.mobs = new Map()
+		for (let mobType in world.lvl1) {
+			this.mobs.set(mobType, game.add.group())
+			world.lvl1[mobType].forEach((coords) => {
+				let mob = this.mobs.get(mobType).create(coords.x, coords.y, 'lvl1', mobType + '00')
+				mob.animations.add(mobType + 'Fly', Phaser.Animation.generateFrameNames(mobType, 0, 1, '', 2))
+				mob.animations.play(mobType + 'Fly', 2, true)
+			})
+		}
+		game.physics.arcade.enable([...this.mobs.values()])
 
-		game.time.events.loop(Phaser.Timer.SECOND * 0.1, () => game.camera.x++)
+		game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++)
 
 		this.input = Object.assign(game.input.keyboard.createCursorKeys(), {
 			space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
@@ -133,11 +135,15 @@ class SpikeImpactGame {
 			this.spikePaw.animations.play('throw')
 		}
 
-		for (let mobGroup of Object.values(this.mobs)) {
+		for (let [mobType, mobGroup] of this.mobs) {
 			game.physics.arcade.collide(mobGroup, this.scrolls, (obj1, obj2) => {
 				obj1.kill()
 				obj2.kill()
-				this.score.add(5)
+				this.score.add(
+					mobType == 'strawberryBat' ? 5 :
+					!mobType.indexOf('parasprite') ? 7 :
+					0
+				)
 			}, null, this)
 		}
 	}
@@ -155,9 +161,9 @@ class SpikeImpactGame {
 		bullet.events.onKilled.add(() => removeTimer(), this)
 
 		let timer = this.game.time.events.loop(
-			Phaser.Timer.SECOND * 0.03,
+			Phaser.Timer.SECOND / 60,
 			() => bullet.position.x - this.game.camera.x < fieldBounds.RIGHT
-				? bullet.position.x++
+				? bullet.position.x+=2
 				: (
 					bullet.destroy()
 				  ,	removeTimer()

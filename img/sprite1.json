@@ -80,5 +80,69 @@
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 12, "h": 13 },
 			"sourceSize": { "w": 12, "h": 13 }
 		}
+		,{
+			"filename": "paraspritePurple00",
+			"frame": { "x": 80, "y": 2, "w": 11, "h": 10 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 10 },
+			"sourceSize": { "w": 11, "h": 10 }
+		}
+		,{
+			"filename": "paraspritePurple01",
+			"frame": { "x": 80, "y": 13, "w": 11, "h": 10 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 10 },
+			"sourceSize": { "w": 11, "h": 10 }
+		}
+		,{
+			"filename": "paraspritePink00",
+			"frame": { "x": 80, "y": 25, "w": 11, "h": 10 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 10 },
+			"sourceSize": { "w": 11, "h": 10 }
+		}
+		,{
+			"filename": "paraspritePink01",
+			"frame": { "x": 80, "y": 36, "w": 11, "h": 10 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 10 },
+			"sourceSize": { "w": 11, "h": 10 }
+		}
+		,{
+			"filename": "paraspriteGreen00",
+			"frame": { "x": 94, "y": 2, "w": 11, "h": 10 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 10 },
+			"sourceSize": { "w": 11, "h": 10 }
+		}
+		,{
+			"filename": "paraspriteGreen01",
+			"frame": { "x": 94, "y": 13, "w": 11, "h": 10 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 10 },
+			"sourceSize": { "w": 11, "h": 10 }
+		}
+		,{
+			"filename": "paraspriteRed00",
+			"frame": { "x": 94, "y": 25, "w": 11, "h": 10 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 10 },
+			"sourceSize": { "w": 11, "h": 10 }
+		}
+		,{
+			"filename": "paraspriteRed01",
+			"frame": { "x": 94, "y": 36, "w": 11, "h": 10 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 10 },
+			"sourceSize": { "w": 11, "h": 10 }
+		}
 	]
 }
