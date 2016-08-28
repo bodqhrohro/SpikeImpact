@@ -33,18 +33,39 @@ class SpikeImpactGame {
 	preload = (game) => {
 		game.load.atlas('lvl1', 'img/sprite1.gif', 'img/sprite1.json')
 		game.load.audio('bgmusic', 'snd/bgmusic.ogg')
+		game.load.image('scoreFont', 'img/scoreFont.gif')
 	}
 
 	initLvl1 = (game) => {
 		window.addEventListener('resize', this._onResize)
 		this._onResize()
 
+		game.physics.startSystem(Phaser.Physics.ARCADE)
+
 		game.stage.backgroundColor = '#587373'
 		game.stage.smoothed = false
 
 		game.world.setBounds(0, 0, 1000, fieldSize.HEIGHT)
 
-		this.scrolls = []
+		this.score = new function() {
+			var setText = (text) => this.font.setText(text, false, 1)
+
+			this.count = 0
+
+			this.font = game.add.retroFont('scoreFont', 4, 7, '0123456789', 10, 1)
+			setText('0000')
+
+			this.text = game.add.image(295, 1, this.font)
+			this.text.fixedToCamera = true
+
+			this.add = (delta) => {
+				this.count += delta
+				setText(Phaser.Animation.generateFrameNames('', this.count, this.count, '', 4)[0])
+
+			}
+		}
+
+		this.scrolls = game.add.group()
 
 		this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy')
 
@@ -59,7 +80,7 @@ class SpikeImpactGame {
 		this.twilightWing = game.add.sprite(9, 18, 'lvl1', 'twilightWing')
 
 		this.twilightWing.anchor.setTo(0, 1)
-		this.game.time.events.loop(Phaser.Timer.SECOND * 0.4, () => this.twilightWing.scale.y = -this.twilightWing.scale.y)
+		game.time.events.loop(Phaser.Timer.SECOND * 0.4, () => this.twilightWing.scale.y = -this.twilightWing.scale.y)
 
 		this.twilight.addChild(this.twilightBody)
 		this.twilight.addChild(this.spike)
@@ -72,14 +93,16 @@ class SpikeImpactGame {
 			10
 		).onComplete.add(this.createBullet)
 
-		this.strawberryBats = game.add.group()
+		this.mobs = {}
+		this.mobs.strawberryBats = game.add.group()
 		world.lvl1.strawberryBats.forEach((coords) => {
-			let bat = this.strawberryBats.create(coords.x, coords.y, 'lvl1', 'strawberryBat00')
+			let bat = this.mobs.strawberryBats.create(coords.x, coords.y, 'lvl1', 'strawberryBat00')
 			bat.animations.add('strawberryBatFly', Phaser.Animation.generateFrameNames('strawberryBat', 0, 1, '', 2))
 			bat.animations.play('strawberryBatFly', 2, true)
 		})
+		game.physics.arcade.enable(Object.values(this.mobs))
 
-		this.game.time.events.loop(Phaser.Timer.SECOND * 0.1, () => game.camera.x++)
+		game.time.events.loop(Phaser.Timer.SECOND * 0.1, () => game.camera.x++)
 
 		this.input = Object.assign(game.input.keyboard.createCursorKeys(), {
 			space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
@@ -109,6 +132,14 @@ class SpikeImpactGame {
 		} else if (this.input.space.isDown || this.input.enter.isDown) {
 			this.spikePaw.animations.play('throw')
 		}
+
+		for (let mobGroup of Object.values(this.mobs)) {
+			game.physics.arcade.collide(mobGroup, this.scrolls, (obj1, obj2) => {
+				obj1.kill()
+				obj2.kill()
+				this.score.add(5)
+			}, null, this)
+		}
 	}
 
 	_setIf = (action, predicate, object, property) => {
@@ -118,19 +149,21 @@ class SpikeImpactGame {
 	}
 
 	createBullet = () => {
-		let bullet = new Phaser.Sprite(this.game, this.spike.world.x + 13, this.spike.world.y + 4, 'lvl1', 'scroll')
-		this.game.world.addChildAt(bullet, 0)
-		var timer = this.game.time.events.loop(
+		let bullet = this.scrolls.create(this.spike.world.x + 13, this.spike.world.y + 4, 'lvl1', 'scroll')
+		this.game.physics.arcade.enable(bullet)
+
+		bullet.events.onKilled.add(() => removeTimer(), this)
+
+		let timer = this.game.time.events.loop(
 			Phaser.Timer.SECOND * 0.03,
 			() => bullet.position.x - this.game.camera.x < fieldBounds.RIGHT
 				? bullet.position.x++
 				: (
 					bullet.destroy()
-				  ,	this.game.time.events.remove(timer)
-				  ,	this.scrolls.splice(this.scrolls.indexOf(bullet), 1)
+				  ,	removeTimer()
 				)
 		)
-		this.scrolls.push(bullet)
+		let removeTimer = () => this.game.time.events.remove(timer)
 	}
 
 	_onResize = () => {

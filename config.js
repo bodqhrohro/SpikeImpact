@@ -64,6 +64,10 @@ System.config({
       "npm:core-js@1.2.7/library/modules/es6.object.assign.js",
       "npm:core-js@1.2.7/library/modules/$.object-assign.js",
       "npm:core-js@1.2.7/library/modules/$.to-object.js",
+      "npm:babel-runtime@5.8.38/core-js/object/values.js",
+      "npm:core-js@1.2.7/library/fn/object/values.js",
+      "npm:core-js@1.2.7/library/modules/es7.object.values.js",
+      "npm:core-js@1.2.7/library/modules/$.object-to-array.js",
       "npm:babel-runtime@5.8.38/helpers/class-call-check.js"
     ]
   },
