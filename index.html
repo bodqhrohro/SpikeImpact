@@ -12,19 +12,27 @@
 			color: red;
 			font-family: "Impact";
 		}
+		#touchKeys, #viewport .gameover {
+			display: none;
+			position: absolute;
+			left: 0;
+			right: 0;
+			position: absolute;
+		}
+		#touchKeys {
+			bottom: 0;
+			font-size: 8em;
+			color: rgba(255, 0, 0, 0.2);
+		}
+		#viewport .gameover {
+			text-align: center;
+			z-index: 1;
+			color: red;
+		}
 		#viewport canvas {
 			margin: auto;
 			image-rendering: -moz-crisp-edges;
 			image-rendering: pixelated;
-		}
-		#touchKeys {
-			display: none;
-			position: absolute;
-			bottom: 0;
-			left: 0;
-			right: 0;
-			font-size: 8em;
-			color: rgba(255, 0, 0, 0.2);
 		}
 		#touchKeys .block {
 			position: absolute;
@@ -48,17 +56,38 @@
 	<script src="config.js"></script>
 	<script>
 		System.import('js/game.js').then(function(game) {
+			var spikeImpact = game.default
+			spikeImpact.onGameOver = function() {
+				var gameOverDiv = document.querySelector('#viewport .gameover')
+
+				if (localStorage) {
+					var highScore = localStorage.getItem('spikeImpactHighScore') |0
+					if (highScore < spikeImpact.score.count) {
+						highScore = spikeImpact.score.count
+						localStorage.setItem('spikeImpactHighScore', highScore)
+						gameOverDiv.innerHTML += '<br/>New HiScore: ' + highScore
+					}
+				}
+
+				var canvasStyle = document.querySelector('#viewport canvas').style
+				canvasStyle.webkitFilter = canvasStyle.filter = 'grayscale(.5)'
+
+				var gameOverStyle = gameOverDiv.style
+				gameOverStyle.height = canvasStyle.height
+				gameOverStyle.fontSize = parseInt(canvasStyle.height) / 6 + 'px'
+				gameOverStyle.display = 'block'
+			}
+
 			System.import('js/virtkb.js').then(function(virtkb) {
-				var phaserGame = game.default.game
-				phaserGame.device.whenReady(function() {
-					virtkb.default(phaserGame)
+				spikeImpact.game.device.whenReady(function() {
+					virtkb.default(spikeImpact.game)
 				})
 			})
 		})
 	</script>
 </head>
 <body>
-	<div id="viewport"><span class="loader">Грузиццо</span></div>
+	<div id="viewport"><span class="loader">Грузиццо</span><div class="gameover">GAME OVER</div></div>
 	<div id="touchKeys">
 		<div class="left block">
 			<div class="up">8</div>

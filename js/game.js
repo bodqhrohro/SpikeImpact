@@ -47,6 +47,36 @@ class SpikeImpactGame {
 
 		game.world.setBounds(0, 0, 2000, fieldSize.HEIGHT)
 
+		this.gameOver = false
+
+		this.health = new (function(_this) {
+			var setText = (text) => text ? this.font.setText(text, false, 1) : this.font.clear()
+
+			var health = 2
+			var accel = 1
+
+			this.damage = () => {
+				--health ? (
+					_this.twilight.cameraOffset.x = 30,
+					_this.twilight.cameraOffset.y = 30
+				) : (
+					_this.gameOver = true,
+					game.time.events.loop(
+						Phaser.Timer.SECOND * 0.05,
+						() => _this.twilight.cameraOffset.y += (accel++),
+						_this.onGameOver()
+					)
+				)
+				setText('*'.repeat(health))
+			}
+
+			this.font = game.add.retroFont('scoreFont', 4, 7, '*', 1, 1, 0, 65)
+			setText('**')
+
+			this.text = game.add.image(1, 1, this.font)
+			this.text.fixedToCamera = true
+		})(this)
+
 		this.score = new function() {
 			var setText = (text) => this.font.setText(text, false, 1)
 
@@ -97,7 +127,9 @@ class SpikeImpactGame {
 			this.mobs.set(mobType, game.add.group(undefined, mobType))
 			world.lvl1[mobType].coords.forEach((coords) => this.spawnMob(mobType, coords))
 		}
+
 		game.physics.arcade.enable([...this.mobs.values()])
+		game.physics.arcade.enable(this.twilightBody)
 
 		game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++)
 
@@ -116,16 +148,18 @@ class SpikeImpactGame {
 	}
 
 	update = (game) => {
+		if (this.gameOver) return
+
 		if (this.input.up.isDown || this.input.w.isDown) {
 			this.twilightWing.scale.y = -1
-			this._setIf((y) => y-=4, (y) => y > fieldBounds.UP, this.twilight.cameraOffset, 'y')
+			this._setIf((y) => y-=2, (y) => y > fieldBounds.UP, this.twilight.cameraOffset, 'y')
 		} else if (this.input.down.isDown || this.input.s.isDown) {
 			this.twilightWing.scale.y = 1
-			this._setIf((y) => y+=4, (y) => y < fieldBounds.BOTTOM - 19, this.twilight.cameraOffset, 'y')
+			this._setIf((y) => y+=2, (y) => y < fieldBounds.BOTTOM - 19, this.twilight.cameraOffset, 'y')
 		} else if (this.input.left.isDown || this.input.a.isDown) {
-			this._setIf((x) => x-=4, (x) => x > fieldBounds.LEFT, this.twilight.cameraOffset, 'x')
+			this._setIf((x) => x-=2, (x) => x > fieldBounds.LEFT, this.twilight.cameraOffset, 'x')
 		} else if (this.input.right.isDown || this.input.d.isDown) {
-			this._setIf((x) => x+=4, (x) => x < fieldBounds.RIGHT - 30, this.twilight.cameraOffset, 'x')
+			this._setIf((x) => x+=2, (x) => x < fieldBounds.RIGHT - 30, this.twilight.cameraOffset, 'x')
 		} else if (this.input.space.isDown || this.input.enter.isDown) {
 			this.spikePaw.animations.play('throw')
 		}
@@ -149,11 +183,14 @@ class SpikeImpactGame {
 						)
 					}
 				} else {
-					mob.kill()
-					this.score.add(world.lvl1[mobType].score)
+					this.killMob(mob)
 				}
 				scroll.kill()
 			}, null, this)
+			game.physics.arcade.collide(this.twilightBody, mobGroup, (twi, mob) => {
+				this.killMob(mob)
+				this.health.damage()
+			})
 		}
 	}
 
@@ -194,6 +231,13 @@ class SpikeImpactGame {
 		mob.animations.play(mobType + 'Fly', 2, true)
 		return mob
 	}
+
+	killMob = (mob) => {
+		mob.kill()
+		this.score.add(world.lvl1[mob.parent.name].score)
+	}
+
+	onGameOver = () => {}
 }
 
 export default new SpikeImpactGame()
