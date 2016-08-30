@@ -267,4 +267,4 @@ class SpikeImpactGame {
 	onGameOver = () => {}
 }
 
-export default new SpikeImpactGame()
+export default SpikeImpactGame

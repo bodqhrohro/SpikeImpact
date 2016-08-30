@@ -12,17 +12,43 @@
 			color: red;
 			font-family: "Impact";
 		}
-		#touchKeys, #viewport .gameover {
+		#touchKeys, #viewport .gameover, #viewport .startmenu {
 			display: none;
 			position: absolute;
 			left: 0;
 			right: 0;
-			position: absolute;
 		}
 		#touchKeys {
 			bottom: 0;
 			font-size: 8em;
 			color: rgba(255, 0, 0, 0.2);
+		}
+		#viewport .startmenu {
+			z-index: 1;
+			bottom: 0;
+			font-size: 4em;
+			background-color: rgba(102, 102, 102, .7);
+		}
+		#viewport .popup {
+			z-index: 2;
+			display: none;
+			position: absolute;
+			top: 5px;
+			bottom: 5px;
+			left: 5px;
+			right: 5px;
+			font-size: 24px;
+			color: #fc6;
+			background-color: #030;
+		}
+		#viewport .startmenu > div, #viewport .gameover .proceed {
+			padding: 1em 0;
+			text-align: center;
+			color: #ccc;
+			cursor: pointer;
+		}
+		#viewport .startmenu > div:active, #viewport .gameover .proceed:active {
+			background-color: #999;
 		}
 		#viewport .gameover {
 			text-align: center;
@@ -55,42 +81,102 @@
 	<script src="jspm_packages/system.js"></script>
 	<script src="config.js"></script>
 	<script>
-		System.import('js/game.js').then(function(game) {
-			var spikeImpact = game.default
-			spikeImpact.onGameOver = function() {
-				var gameOverDiv = document.querySelector('#viewport .gameover')
+		Promise.all([
+			System.import('js/game.js'),
+			System.import('js/virtkb.js')
+		]).then(function(results) {
+			var game = results[0]
+			var virtkb = results[1]
 
-				if (spikeImpact.win)
-					gameOverDiv.innerHTML = 'МЫ КУПИЛИ КЕРОСИН!'
+			var spikeImpact
 
-				if (localStorage) {
-					var highScore = localStorage.getItem('spikeImpactHighScore') |0
-					if (highScore < spikeImpact.score.count) {
-						highScore = spikeImpact.score.count
-						localStorage.setItem('spikeImpactHighScore', highScore)
-						gameOverDiv.innerHTML += '<br/>New HiScore: ' + highScore
+			var startMenuStyle = document.querySelector('#viewport .startmenu').style
+			startMenuStyle.display = 'block'
+
+			Array.prototype.forEach.call(document.querySelectorAll('#viewport .startmenu > div'), function(item) {
+				item.addEventListener('click', function(e) {
+					switch (e.target.className) {
+						case 'newgame':
+							if (spikeImpact)
+								spikeImpact.game.destroy()
+
+							spikeImpact = new game.default()
+
+							spikeImpact.game.device.whenReady(function() {
+								virtkb.default(spikeImpact.game)
+							})
+
+							spikeImpact.onGameOver = function() {
+								var gameOverMsg = gameOverDiv.querySelector('.message')
+
+								gameOverMsg.innerHTML = spikeImpact.win
+									? 'МЫ КУПИЛИ КЕРОСИН!'
+									: 'GAME OVER'
+
+								if (localStorage) {
+									var highScore = localStorage.getItem('spikeImpactHighScore') |0
+									if (highScore < spikeImpact.score.count) {
+										highScore = spikeImpact.score.count
+										localStorage.setItem('spikeImpactHighScore', highScore)
+										gameOverMsg.innerHTML += '<br/>New HiScore: ' + highScore
+									}
+								}
+
+								var canvasStyle = document.querySelector('#viewport canvas').style
+								canvasStyle.webkitFilter = canvasStyle.filter = spikeImpact.win ? 'contrast(3)' : 'grayscale(.5)'
+
+								var gameOverStyle = gameOverDiv.style
+								gameOverStyle.height = canvasStyle.height
+								gameOverStyle.fontSize = parseInt(canvasStyle.height) / 6 + 'px'
+								gameOverStyle.display = 'block'
+							}
+						break;
+						case 'highscore':
+							popup.innerHTML = 'High score: ' + (localStorage ? (localStorage.getItem('spikeImpactHighScore') |0) : '')
+							popup.style.display = 'block'
+						break;
+						case 'help':
+							popup.innerHTML =
+								'Controls: WASD and Enter or ←↑→↓ and Space<br>' +
+								'Shoot \'em all up!<br>' +
+								'Parasprites don\'t wait long till you finish them! Be careful!'
+							popup.style.display = 'block'
+						break;
 					}
-				}
-
-				var canvasStyle = document.querySelector('#viewport canvas').style
-				canvasStyle.webkitFilter = canvasStyle.filter = spikeImpact.win ? 'contrast(3)' : 'grayscale(.5)'
-
-				var gameOverStyle = gameOverDiv.style
-				gameOverStyle.height = canvasStyle.height
-				gameOverStyle.fontSize = parseInt(canvasStyle.height) / 6 + 'px'
-				gameOverStyle.display = 'block'
-			}
-
-			System.import('js/virtkb.js').then(function(virtkb) {
-				spikeImpact.game.device.whenReady(function() {
-					virtkb.default(spikeImpact.game)
+					startMenuStyle.display = 'none'
 				})
+			})
+
+			var gameOverDiv = document.querySelector('#viewport .gameover')
+
+			gameOverDiv.querySelector('.proceed').addEventListener('click', function(e) {
+				gameOverDiv.style.display = 'none'
+				startMenuStyle.display = 'block'
+			})
+
+			var popup = document.querySelector('#viewport .popup')
+			popup.addEventListener('click', function(e) {
+				e.target.style.display = 'none'
+				startMenuStyle.display = 'block'
 			})
 		})
 	</script>
 </head>
 <body>
-	<div id="viewport"><span class="loader">Грузиццо</span><div class="gameover">GAME OVER</div></div>
+	<div id="viewport">
+		<span class="loader">Грузиццо</span>
+		<div class="gameover">
+			<div class="message"></div>
+			<div class="proceed">PROCEED</div>
+		</div>
+		<div class="startmenu">
+			<div class="newgame">NEW GAME</div>
+			<div class="highscore">HIGH SCORE</div>
+			<div class="help">HELP</div>
+		</div>
+		<div class="popup">
+		</div>
+	</div>
 	<div id="touchKeys">
 		<div class="left block">
 			<div class="up">8</div>
