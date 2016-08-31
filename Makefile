@@ -1,2 +1,2 @@
 all:
-	jspm bundle js/game + js/virtkb --inject
+	jspm bundle js/game + js/virtkb --inject --minify
