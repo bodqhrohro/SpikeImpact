@@ -142,6 +142,7 @@ class SpikeImpactGame {
 			s: game.input.keyboard.addKey(Phaser.KeyCode.S),
 			d: game.input.keyboard.addKey(Phaser.KeyCode.D)
 		})
+		game.input.keyboard.addKey(Phaser.KeyCode.Z).onUp.add(() => game.sound.mute = !game.sound.mute)
 
 		game.add.sound('bgmusic', 1, true).play()
 

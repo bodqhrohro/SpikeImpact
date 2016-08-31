@@ -103,7 +103,12 @@
 							spikeImpact = new game.default()
 
 							spikeImpact.game.device.whenReady(function() {
-								virtkb.default(spikeImpact.game)
+								var game = spikeImpact.game
+								virtkb.default(game)
+								var muteToggle = function() { game.sound.mute = !game.sound.mute }
+								var canvas = document.querySelector('#viewport canvas')
+								canvas.addEventListener('click', muteToggle)
+								canvas.addEventListener('touchend', muteToggle)
 							})
 
 							spikeImpact.onGameOver = function() {
@@ -139,7 +144,8 @@
 							popup.innerHTML =
 								'Controls: WASD and Enter or ←↑→↓ and Space<br>' +
 								'Shoot \'em all up!<br>' +
-								'Parasprites don\'t wait long till you finish them! Be careful!'
+								'Parasprites don\'t wait long till you finish them! Be careful!<br>' +
+								'Mute is toggled by Z or by tapping the game'
 							popup.style.display = 'block'
 						break;
 					}
