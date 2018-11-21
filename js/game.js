@@ -126,7 +126,13 @@ class SpikeImpactGame {
 		this.mobs = new Map()
 		for (let mobType in world.lvl1) {
 			this.mobs.set(mobType, game.add.group(undefined, mobType))
-			world.lvl1[mobType].coords.forEach((coords) => this.spawnMob(mobType, coords))
+			let mobParams = world.lvl1[mobType]
+			mobParams.coords.forEach((coords) => this.spawnMob(
+				mobType,
+				coords,
+				mobParams.health,
+				mobParams.score
+			))
 		}
 
 		game.physics.arcade.enable([...this.mobs.values()])
@@ -180,8 +186,18 @@ class SpikeImpactGame {
 							() => {
 								if (mob.alive) {
 									game.physics.arcade.enable([
-										this.spawnMob(mob.parent.name, { x: mob.x, y: mob.y-10 }),
-										this.spawnMob(mob.parent.name, { x: mob.x, y: mob.y+10 })
+										this.spawnMob(
+											mob.parent.name,
+											{ x: mob.x, y: mob.y-10 },
+											mob.maxHealth,
+											mob.score,
+										),
+										this.spawnMob(
+											mob.parent.name,
+											{ x: mob.x, y: mob.y+10 },
+											mob.maxHealth,
+											mob.score,
+										),
 									])
 									mob.destroy()
 								}
@@ -190,11 +206,6 @@ class SpikeImpactGame {
 					}
 				} else {
 					this.killMob(mob)
-					if (mob.parent.name == 'tiret') {
-						this.gameOver = true
-						this.win = true
-						this.onGameOver()
-					}
 				}
 				scroll.kill()
 			}, null, this)
@@ -237,9 +248,11 @@ class SpikeImpactGame {
 		this.game.scale.setUserScale(scaleFactor, scaleFactor, 0, 0)
 	}
 
-	spawnMob = (mobType, coords) => {
+	spawnMob = (mobType, coords, health, score) => {
 		let mob = this.mobs.get(mobType).create(coords.x, coords.y, 'lvl1', mobType + '00')
-		mob.health = world.lvl1[mobType].health
+		mob.health = health
+		mob.maxHealth = health
+		mob.score = score
 		if (mobType == 'tiret') {
 			let phase
 			let timer = this.game.time.events.loop(
@@ -266,7 +279,12 @@ class SpikeImpactGame {
 
 	killMob = (mob) => {
 		mob.kill()
-		this.score.add(world.lvl1[mob.parent.name].score)
+		this.score.add(mob.score)
+		if (mob.parent.name == 'tiret') {
+			this.gameOver = true
+			this.win = true
+			this.onGameOver()
+		}
 	}
 
 	onGameOver = () => {}
