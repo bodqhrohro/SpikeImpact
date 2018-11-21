@@ -134,6 +134,14 @@ class SpikeImpactGame {
 
 		game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++)
 
+		this._setupKeyboard(game)
+
+		game.add.sound('bgmusic', 1, true).play()
+
+		document.querySelector('#viewport .loader').style.display = 'none'
+	}
+
+	_setupKeyboard = (game) => {
 		this.input = Object.assign(game.input.keyboard.createCursorKeys(), {
 			space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
 			enter: game.input.keyboard.addKey(Phaser.KeyCode.ENTER),
@@ -143,10 +151,6 @@ class SpikeImpactGame {
 			d: game.input.keyboard.addKey(Phaser.KeyCode.D)
 		})
 		game.input.keyboard.addKey(Phaser.KeyCode.Z).onUp.add(() => game.sound.mute = !game.sound.mute)
-
-		game.add.sound('bgmusic', 1, true).play()
-
-		document.querySelector('#viewport .loader').style.display = 'none'
 	}
 
 	update = (game) => {
