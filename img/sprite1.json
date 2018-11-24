@@ -168,5 +168,13 @@
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 47, "h": 114 },
 			"sourceSize": { "w": 47, "h": 114 }
 		}
+		,{
+			"filename": "tiretSplash00",
+			"frame": { "x": 122, "y": 59, "w": 10, "h": 8 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 8 },
+			"sourceSize": { "w": 10, "h": 8 }
+		}
 	]
 }

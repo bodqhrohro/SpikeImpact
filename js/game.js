@@ -13,6 +13,8 @@ const fieldBounds = {
 	BOTTOM: 199
 }
 
+let randGen = new Phaser.RandomDataGenerator()
+
 class SpikeImpactGame {
 	constructor() {
 		this.game = new Phaser.Game(
@@ -96,6 +98,7 @@ class SpikeImpactGame {
 		}
 
 		this.scrolls = game.add.group()
+		this.counterblows = game.add.group()
 
 		this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy')
 
@@ -121,7 +124,12 @@ class SpikeImpactGame {
 			'throw',
 			Phaser.Animation.generateFrameNames('spikePaw', 0, 2, '', 2).concat('dummy'),
 			10
-		).onComplete.add(this.createBullet)
+		).onComplete.add(() => this.createBullet(
+			this.spike.world.x + 13,
+			this.spike.world.y + 4,
+			'lvl1',
+			'scroll',
+		))
 
 		this.mobs = new Map()
 		for (let mobType in world.lvl1) {
@@ -214,6 +222,10 @@ class SpikeImpactGame {
 					this.killMob(mob)
 				this.health.damage()
 			})
+			game.physics.arcade.collide(this.twilightBody, this.counterblows, (twi, bullet) => {
+				bullet.kill()
+				this.health.damage()
+			})
 		}
 	}
 
@@ -223,20 +235,31 @@ class SpikeImpactGame {
 			object[property] = updated
 	}
 
-	createBullet = () => {
-		let bullet = this.scrolls.create(this.spike.world.x + 13, this.spike.world.y + 4, 'lvl1', 'scroll')
+	createBullet = (...args) => {
+		const [ x, y, level, type ] = args
+
+		const isScroll = type === 'scroll'
+		const bullet = this[isScroll ? 'scrolls' : 'counterblows'].create(...args)
+
 		this.game.physics.arcade.enable(bullet)
 
 		bullet.events.onKilled.add(() => this._removeTimer(), this)
 
-		let timer = this.game.time.events.loop(
+		const bulletDestroy = () => {
+			bullet.destroy()
+			this._removeTimer(timer)
+		}
+
+		const scrollUpdater = () => bullet.position.x - this.game.camera.x < fieldBounds.RIGHT
+			? bullet.position.x+=2
+			: bulletDestroy()
+		const counterblowUpdater = () => bullet.position.x - this.game.camera.x > fieldBounds.LEFT
+			? bullet.position.x-=3
+			: bulletDestroy()
+
+		const timer = this.game.time.events.loop(
 			Phaser.Timer.SECOND / 60,
-			() => bullet.position.x - this.game.camera.x < fieldBounds.RIGHT
-				? bullet.position.x+=2
-				: (
-					bullet.destroy()
-				  ,	this._removeTimer(timer)
-				)
+			isScroll ? scrollUpdater : counterblowUpdater,
 		)
 	}
 
@@ -262,10 +285,18 @@ class SpikeImpactGame {
 						this._removeTimer(timer)
 						return
 					}
-					if (mob.y <=20) {
+					if (mob.y <= 20) {
 						phase = 1
-					} else if (mob.y >=70) {
+					} else if (mob.y >= 70) {
 						phase = -1
+					}
+					if (mob.inCamera && Math.random() < 0.05) {
+						this.createBullet(
+							mob.world.x + mob.width / 2,
+							randGen.between(mob.y + 20, mob.bottom - 20),
+							'lvl1',
+							'tiretSplash00',
+						)
 					}
 					mob.y += phase
 				}
