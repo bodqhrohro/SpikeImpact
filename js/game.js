@@ -33,7 +33,7 @@ class SpikeImpactGame {
 	}
 
 	preload = (game) => {
-		game.load.atlas('lvl1', 'img/sprite1.gif', 'img/sprite1.json')
+		game.load.atlas('lvl1', 'img/sprite1.png', 'img/sprite1.json')
 		game.load.audio('bgmusic', 'snd/bgmusic.ogg')
 		game.load.image('scoreFont', 'img/scoreFont.gif')
 	}
@@ -59,17 +59,18 @@ class SpikeImpactGame {
 			var accel = 1
 
 			this.damage = () => {
-				--health ? (
-					_this.twilight.cameraOffset.x = 30,
+				if (--health) {
+					_this.twilight.cameraOffset.x = 30
 					_this.twilight.cameraOffset.y = 30
-				) : (
-					_this.gameOver = true,
+					_this.activateField()
+				} else {
+					_this.gameOver = true
 					game.time.events.loop(
 						Phaser.Timer.SECOND * 0.05,
 						() => _this.twilight.cameraOffset.y += (accel++),
 						_this.onGameOver()
 					)
-				)
+				}
 				setText('*'.repeat(health))
 			}
 
@@ -185,6 +186,12 @@ class SpikeImpactGame {
 		}
 
 		for (let [mobType, mobGroup] of this.mobs) {
+			if (this.protectionField) {
+				game.physics.arcade.collide(this.protectionField, mobGroup, (field, mob) => {
+					this.killMob(mob)
+				})
+			}
+
 			game.physics.arcade.collide(mobGroup, this.scrolls, (mob, scroll) => {
 				if (mob.health > 1) {
 					mob.damage(1)
@@ -217,15 +224,17 @@ class SpikeImpactGame {
 				}
 				scroll.kill()
 			}, null, this)
-			game.physics.arcade.collide(this.twilightBody, mobGroup, (twi, mob) => {
-				if (mob.parent.name != 'tiret')
-					this.killMob(mob)
-				this.health.damage()
-			})
-			game.physics.arcade.collide(this.twilightBody, this.counterblows, (twi, bullet) => {
-				bullet.kill()
-				this.health.damage()
-			})
+			if (!this.protectionField) {
+				game.physics.arcade.collide(this.twilightBody, mobGroup, (twi, mob) => {
+					if (mob.parent.name != 'tiret')
+						this.killMob(mob)
+					this.health.damage()
+				})
+				game.physics.arcade.collide(this.twilightBody, this.counterblows, (twi, bullet) => {
+					bullet.kill()
+					this.health.damage()
+				})
+			}
 		}
 	}
 
@@ -319,6 +328,25 @@ class SpikeImpactGame {
 	}
 
 	onGameOver = () => {}
+
+	activateField = () => {
+		this.protectionField = this.game.add.sprite(-4, -8, 'lvl1', 'protectionField00')
+		this.game.physics.arcade.enable(this.protectionField)
+		this.protectionField.body.setCircle(22.5, 0, 0)
+		this.protectionField.body.immovable = true
+
+		this.twilight.addChild(this.protectionField)
+
+		this.game.time.events.add(
+			Phaser.Timer.SECOND * 3,
+			this.destroyField,
+		)
+	}
+
+	destroyField = () => {
+		this.protectionField.kill()
+		delete this.protectionField
+	}
 }
 
 export default SpikeImpactGame

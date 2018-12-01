@@ -176,5 +176,13 @@
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 8 },
 			"sourceSize": { "w": 10, "h": 8 }
 		}
+		,{
+			"filename": "protectionField00",
+			"frame": { "x": 1, "y": 66, "w": 45, "h": 45 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 45 },
+			"sourceSize": { "w": 45, "h": 45 }
+		}
 	]
 }
