@@ -13,6 +13,13 @@ const fieldBounds = {
 	BOTTOM: 199
 }
 
+const scoreFontSize = {
+	WIDTH: 4,
+	HEIGHT: 7
+}
+
+const TOP_BAR_Y_OFFSET = 1
+
 let randGen = new Phaser.RandomDataGenerator()
 
 class SpikeImpactGame {
@@ -62,7 +69,7 @@ class SpikeImpactGame {
 				if (--health) {
 					_this.twilight.cameraOffset.x = 30
 					_this.twilight.cameraOffset.y = 30
-					_this.activateField()
+					_this.activateField('defense')
 				} else {
 					_this.gameOver = true
 					game.time.events.loop(
@@ -74,10 +81,10 @@ class SpikeImpactGame {
 				setText('*'.repeat(health))
 			}
 
-			this.font = game.add.retroFont('scoreFont', 4, 7, '*', 1, 1, 0, 65)
+			this.font = game.add.retroFont('scoreFont', scoreFontSize.WIDTH, scoreFontSize.HEIGHT, '*', 1, 1, 0, 65)
 			setText('**')
 
-			this.text = game.add.image(1, 1, this.font)
+			this.text = game.add.image(1, TOP_BAR_Y_OFFSET, this.font)
 			this.text.fixedToCamera = true
 		})(this)
 
@@ -86,16 +93,50 @@ class SpikeImpactGame {
 
 			this.count = 0
 
-			this.font = game.add.retroFont('scoreFont', 4, 7, '0123456789', 10, 1)
+			this.font = game.add.retroFont('scoreFont', scoreFontSize.WIDTH, scoreFontSize.HEIGHT, '0123456789', 10, 1)
 			setText('00000')
 
-			this.text = game.add.image(295, 1, this.font)
+			this.text = game.add.image(295, TOP_BAR_Y_OFFSET, this.font)
 			this.text.fixedToCamera = true
 
 			this.add = (delta) => {
 				this.count += delta
 				setText(Phaser.Animation.generateFrameNames('', this.count, this.count, '', 5)[0])
 			}
+		}
+
+		this.mana = new function() {
+			this.MANA_MAX = 1000
+
+			this.amount = this.MANA_MAX
+
+			this.font = game.add.retroFont('scoreFont', scoreFontSize.WIDTH, scoreFontSize.HEIGHT, 'AMN', 3, 1, 0, 50)
+			this.font.setText('MANA', false, 1)
+
+			this.text = game.add.image(50, TOP_BAR_Y_OFFSET, this.font)
+			this.text.fixedToCamera = true
+
+			const COLOR = 0xffffff
+			const ALPHA = 1
+			const MANA_BAR_WIDTH = 100
+			const GAP = 2
+
+			this.manaFrame = game.add.graphics(70, TOP_BAR_Y_OFFSET)
+			this.manaFrame.fixedToCamera = true
+			this.manaFrame.lineStyle(1, COLOR, ALPHA)
+			this.manaFrame.drawRect(0, 0, MANA_BAR_WIDTH + GAP * 2, scoreFontSize.HEIGHT)
+
+			this.manaBar = game.add.graphics(70 + GAP, TOP_BAR_Y_OFFSET + GAP)
+			this.manaBar.fixedToCamera = true
+
+			this.updateManaBar = () => {
+				this.manaBar.clear()
+				this.manaBar.lineStyle(1, COLOR, ALPHA)
+				this.manaBar.beginFill(COLOR, ALPHA)
+				this.manaBar.drawRect(0, 0, (this.amount / this.MANA_MAX * MANA_BAR_WIDTH) |0, scoreFontSize.HEIGHT - GAP * 2)
+				this.manaBar.endFill()
+			}
+			this.updateManaBar()
 		}
 
 		this.scrolls = game.add.group()
@@ -160,6 +201,8 @@ class SpikeImpactGame {
 		this.input = Object.assign(game.input.keyboard.createCursorKeys(), {
 			space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
 			enter: game.input.keyboard.addKey(Phaser.KeyCode.ENTER),
+			tab: game.input.keyboard.addKey(Phaser.KeyCode.TAB),
+			shift: game.input.keyboard.addKey(Phaser.KeyCode.SHIFT),
 			w: game.input.keyboard.addKey(Phaser.KeyCode.W),
 			a: game.input.keyboard.addKey(Phaser.KeyCode.A),
 			s: game.input.keyboard.addKey(Phaser.KeyCode.S),
@@ -171,6 +214,7 @@ class SpikeImpactGame {
 	update = (game) => {
 		if (this.gameOver) return
 
+		// keyboard
 		if (this.input.up.isDown || this.input.w.isDown) {
 			this.twilightWing.scale.y = -1
 			this._setIf((y) => y-=2, (y) => y > fieldBounds.UP, this.twilight.cameraOffset, 'y')
@@ -183,12 +227,19 @@ class SpikeImpactGame {
 			this._setIf((x) => x+=2, (x) => x < fieldBounds.RIGHT - 30, this.twilight.cameraOffset, 'x')
 		} else if (this.input.space.isDown || this.input.enter.isDown) {
 			this.spikePaw.animations.play('throw')
+		} else if (this.input.tab.isDown || this.input.shift.isDown) {
+			if (this.mana.amount >= this.mana.MANA_MAX) {
+				this.activateField('attack')
+			}
 		}
 
+		// collisions
 		for (let [mobType, mobGroup] of this.mobs) {
 			if (this.protectionField) {
 				game.physics.arcade.collide(this.protectionField, mobGroup, (field, mob) => {
-					this.killMob(mob)
+					if (mob.parent.name != 'tiret') {
+						this.killMob(mob)
+					}
 				})
 			}
 
@@ -226,8 +277,9 @@ class SpikeImpactGame {
 			}, null, this)
 			if (!this.protectionField) {
 				game.physics.arcade.collide(this.twilightBody, mobGroup, (twi, mob) => {
-					if (mob.parent.name != 'tiret')
+					if (mob.parent.name != 'tiret') {
 						this.killMob(mob)
+					}
 					this.health.damage()
 				})
 				game.physics.arcade.collide(this.twilightBody, this.counterblows, (twi, bullet) => {
@@ -236,6 +288,18 @@ class SpikeImpactGame {
 				})
 			}
 		}
+
+		// mana
+		if (this.protectionField && this.protectionFieldMode === 'attack') {
+			this.mana.amount -= 5
+			if (this.mana.amount <= 0) {
+				this.destroyField()
+			}
+		}
+		if (this.mana.amount < this.mana.MANA_MAX) {
+			this.mana.amount ++
+		}
+		this.mana.updateManaBar()
 	}
 
 	_setIf = (action, predicate, object, property) => {
@@ -329,7 +393,13 @@ class SpikeImpactGame {
 
 	onGameOver = () => {}
 
-	activateField = () => {
+	activateField = (mode) => {
+		if (this.protectionField) {
+			this.destroyField()
+		}
+
+		this.protectionFieldMode = mode
+
 		this.protectionField = this.game.add.sprite(-4, -8, 'lvl1', 'protectionField00')
 		this.game.physics.arcade.enable(this.protectionField)
 		this.protectionField.body.setCircle(22.5, 0, 0)
@@ -337,15 +407,20 @@ class SpikeImpactGame {
 
 		this.twilight.addChild(this.protectionField)
 
-		this.game.time.events.add(
-			Phaser.Timer.SECOND * 3,
-			this.destroyField,
-		)
+		if (mode === 'defense') {
+			this.game.time.events.add(
+				Phaser.Timer.SECOND * 3,
+				this.destroyField,
+			)
+		}
 	}
 
 	destroyField = () => {
-		this.protectionField.kill()
-		delete this.protectionField
+		if (this.protectionField) {
+			this.protectionField.kill()
+			delete this.protectionField
+			delete this.protectionFieldMode
+		}
 	}
 }
 

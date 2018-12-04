@@ -8,7 +8,7 @@ if ('ontouchstart' in window) {
 	let classMappings = {
 		up: Phaser.KeyCode.UP,
 		down: Phaser.KeyCode.DOWN,
-		onus: Phaser.KeyCode.TAB,
+		bonus: Phaser.KeyCode.TAB,
 		left: Phaser.KeyCode.LEFT,
 		right: Phaser.KeyCode.RIGHT,
 		shoot: Phaser.KeyCode.SPACEBAR
