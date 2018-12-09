@@ -70,6 +70,7 @@ class SpikeImpactGame {
 					_this.twilight.cameraOffset.x = 30
 					_this.twilight.cameraOffset.y = 30
 					_this.activateField('defense')
+					_this.destroyBeam()
 				} else {
 					_this.gameOver = true
 					game.time.events.loop(
@@ -120,16 +121,24 @@ class SpikeImpactGame {
 			const ALPHA = 1
 			const MANA_BAR_WIDTH = 100
 			const GAP = 2
+			const MANA_BAR_WIDTH_THIRD = (MANA_BAR_WIDTH / 3) | 0
 
 			this.manaFrame = game.add.graphics(70, TOP_BAR_Y_OFFSET)
 			this.manaFrame.fixedToCamera = true
 			this.manaFrame.lineStyle(1, COLOR, ALPHA)
 			this.manaFrame.drawRect(0, 0, MANA_BAR_WIDTH + GAP * 2, scoreFontSize.HEIGHT)
+			this.manaFrame.drawRect(MANA_BAR_WIDTH_THIRD + 1, 0, MANA_BAR_WIDTH_THIRD, scoreFontSize.HEIGHT)
 
 			this.manaBar = game.add.graphics(70 + GAP, TOP_BAR_Y_OFFSET + GAP)
 			this.manaBar.fixedToCamera = true
 
 			this.updateManaBar = () => {
+				const COLOR = this.amount < this.MANA_MAX / 3
+					? 0xff0000
+					: (this.amount < this.MANA_MAX * 2 /3
+						? 0xffff00
+						: 0x00ff00
+					)
 				this.manaBar.clear()
 				this.manaBar.lineStyle(1, COLOR, ALPHA)
 				this.manaBar.beginFill(COLOR, ALPHA)
@@ -213,6 +222,7 @@ class SpikeImpactGame {
 
 	update = (game) => {
 		if (this.gameOver) return
+		let wasMovedX = false
 
 		// keyboard
 		if (this.input.up.isDown || this.input.w.isDown) {
@@ -223,13 +233,17 @@ class SpikeImpactGame {
 			this._setIf((y) => y+=2, (y) => y < fieldBounds.BOTTOM - 19, this.twilight.cameraOffset, 'y')
 		} else if (this.input.left.isDown || this.input.a.isDown) {
 			this._setIf((x) => x-=2, (x) => x > fieldBounds.LEFT, this.twilight.cameraOffset, 'x')
+			wasMovedX = true
 		} else if (this.input.right.isDown || this.input.d.isDown) {
 			this._setIf((x) => x+=2, (x) => x < fieldBounds.RIGHT - 30, this.twilight.cameraOffset, 'x')
+			wasMovedX = true
 		} else if (this.input.space.isDown || this.input.enter.isDown) {
 			this.spikePaw.animations.play('throw')
 		} else if (this.input.tab.isDown || this.input.shift.isDown) {
 			if (this.mana.amount >= this.mana.MANA_MAX) {
 				this.activateField('attack')
+			} else if (this.mana.amount >= this.mana.MANA_MAX / 3) {
+				this.activateBeam()
 			}
 		}
 
@@ -243,36 +257,14 @@ class SpikeImpactGame {
 				})
 			}
 
+			if (this.beam) {
+				game.physics.arcade.collide(this.beam, mobGroup, (beam, mob) => {
+					this._mobDamage(mob, mobType, 0.3)
+				})
+			}
+
 			game.physics.arcade.collide(mobGroup, this.scrolls, (mob, scroll) => {
-				if (mob.health > 1) {
-					mob.damage(1)
-					if (!mobType.indexOf('parasprite')) {
-						game.time.events.add(
-							Phaser.Timer.SECOND * 2,
-							() => {
-								if (mob.alive) {
-									game.physics.arcade.enable([
-										this.spawnMob(
-											mob.parent.name,
-											{ x: mob.x, y: mob.y-10 },
-											mob.maxHealth,
-											mob.score,
-										),
-										this.spawnMob(
-											mob.parent.name,
-											{ x: mob.x, y: mob.y+10 },
-											mob.maxHealth,
-											mob.score,
-										),
-									])
-									mob.destroy()
-								}
-							}
-						)
-					}
-				} else {
-					this.killMob(mob)
-				}
+				this._mobDamage(mob, mobType, 1)
 				scroll.kill()
 			}, null, this)
 			if (!this.protectionField) {
@@ -290,16 +282,28 @@ class SpikeImpactGame {
 		}
 
 		// mana
+		const oldMana = this.mana.amount
 		if (this.protectionField && this.protectionFieldMode === 'attack') {
 			this.mana.amount -= 5
 			if (this.mana.amount <= 0) {
 				this.destroyField()
 			}
 		}
+		if (this.beam) {
+			this.mana.amount -= 5
+			if (this.beamThreshold > this.mana.amount) {
+				this.destroyBeam()
+			}
+		}
 		if (this.mana.amount < this.mana.MANA_MAX) {
 			this.mana.amount ++
 		}
-		this.mana.updateManaBar()
+		if (oldMana !== this.mana.amount) {
+			this.mana.updateManaBar()
+		}
+		if (this.beam && (wasMovedX || this.beam.width === 1)) {
+			this.updateBeam()
+		}
 	}
 
 	_setIf = (action, predicate, object, property) => {
@@ -391,9 +395,46 @@ class SpikeImpactGame {
 		}
 	}
 
+	_mobDamage = (mob, mobType, amount) => {
+		const game = this.game
+		if (mob.health - 0.01 > amount) {
+			mob.damage(amount)
+			if (!mobType.indexOf('parasprite')) {
+				game.time.events.add(
+					Phaser.Timer.SECOND * 2,
+					() => {
+						if (mob.alive) {
+							game.physics.arcade.enable([
+								this.spawnMob(
+									mob.parent.name,
+									{ x: mob.x, y: mob.y-10 },
+									mob.maxHealth,
+									mob.score,
+								),
+								this.spawnMob(
+									mob.parent.name,
+									{ x: mob.x, y: mob.y+10 },
+									mob.maxHealth,
+									mob.score,
+								),
+							])
+							mob.destroy()
+						}
+					}
+				)
+			}
+		} else {
+			this.killMob(mob)
+		}
+	}
+
 	onGameOver = () => {}
 
 	activateField = (mode) => {
+		if (this.beam) {
+			return
+		}
+
 		if (this.protectionField) {
 			this.destroyField()
 		}
@@ -420,6 +461,39 @@ class SpikeImpactGame {
 			this.protectionField.kill()
 			delete this.protectionField
 			delete this.protectionFieldMode
+		}
+	}
+
+	activateBeam = () => {
+		if (this.protectionField || this.beam) {
+			return
+		}
+
+		this.beam = this.game.add.tileSprite(36, 0, 1, 4, 'lvl1', 'beam00')
+		this.game.physics.arcade.enable(this.beam)
+
+		this.twilight.addChild(this.beam)
+
+		this.beamThreshold = this.mana.amount - this.mana.MANA_MAX / 3
+		if (this.beamThreshold < 0) {
+			this.beamThreshold = 0
+		}
+	}
+
+	updateBeam = () => {
+		if (this.beam) {
+			if (this.beam.position.x !== this.beam.world.x) {
+				this.beam.width = fieldSize.WIDTH - (this.beam.world.x - this.game.camera.x)
+				this.beam.body.setSize(this.beam.width, this.beam.height)
+			}
+		}
+	}
+
+	destroyBeam = () => {
+		if (this.beam) {
+			this.beam.kill()
+			delete this.beam
+			delete this.beamThreshold
 		}
 	}
 }
