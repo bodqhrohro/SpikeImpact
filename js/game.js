@@ -30,7 +30,7 @@ class SpikeImpactGame {
 			Phaser.AUTO,
 			document.getElementById('viewport'),
 			{
-				create: this.initLvl1,
+				create: this.initGame,
 				preload: this.preload,
 				update: this.update
 			},
@@ -45,19 +45,51 @@ class SpikeImpactGame {
 		game.load.image('scoreFont', 'img/scoreFont.gif')
 	}
 
+	initGame = (game) => {
+		this.gameOver = false
+		this.win = false
+
+		this.initLvl1(game)
+
+		document.querySelector('#viewport .loader').style.display = 'none'
+	}
+
 	initLvl1 = (game) => {
+		this.currentLevel = 1
+
+		this._initLvlGeneric(game)
+
+		game.stage.backgroundColor = '#587373'
+
+		game.world.setBounds(0, 0, 1800, fieldSize.HEIGHT)
+
+		this._initTwilight(game)
+
+		this.mobs = new Map()
+		for (let mobType in world.lvl1) {
+			this.mobs.set(mobType, game.add.group(undefined, mobType))
+			let mobParams = world.lvl1[mobType]
+			mobParams.coords.forEach((coords) => this.spawnMob(
+				mobType,
+				coords,
+				mobParams.health,
+				mobParams.score
+			))
+		}
+
+		game.physics.arcade.enable([...this.mobs.values()])
+
+		game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++)
+
+		game.add.sound('bgmusic', 1, true).play()
+	}
+
+	_initLvlGeneric = (game) => {
 		window.addEventListener('resize', this._onResize)
 		this._onResize()
 
 		game.physics.startSystem(Phaser.Physics.ARCADE)
-
-		game.stage.backgroundColor = '#587373'
 		game.stage.smoothed = false
-
-		game.world.setBounds(0, 0, 1800, fieldSize.HEIGHT)
-
-		this.gameOver = false
-		this.win = false
 
 		this.health = new (function(_this) {
 			var setText = (text) => text ? this.font.setText(text, false, 1) : this.font.clear()
@@ -151,6 +183,17 @@ class SpikeImpactGame {
 		this.scrolls = game.add.group()
 		this.counterblows = game.add.group()
 
+		this._setupKeyboard(game)
+	}
+
+	nextLvl = () => {
+		if (this.currentLevel === 1) {
+			this.win = true
+			this.onGameOver()
+		}
+	}
+
+	_initTwilight = (game) => {
 		this.twilight = game.add.sprite(30, 30, 'lvl1', 'dummy')
 
 		this.spike = game.add.sprite(15, 0, 'lvl1', 'dummy')
@@ -182,28 +225,7 @@ class SpikeImpactGame {
 			'scroll',
 		))
 
-		this.mobs = new Map()
-		for (let mobType in world.lvl1) {
-			this.mobs.set(mobType, game.add.group(undefined, mobType))
-			let mobParams = world.lvl1[mobType]
-			mobParams.coords.forEach((coords) => this.spawnMob(
-				mobType,
-				coords,
-				mobParams.health,
-				mobParams.score
-			))
-		}
-
-		game.physics.arcade.enable([...this.mobs.values()])
 		game.physics.arcade.enable(this.twilightBody)
-
-		game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++)
-
-		this._setupKeyboard(game)
-
-		game.add.sound('bgmusic', 1, true).play()
-
-		document.querySelector('#viewport .loader').style.display = 'none'
 	}
 
 	_setupKeyboard = (game) => {
@@ -251,7 +273,7 @@ class SpikeImpactGame {
 		for (let [mobType, mobGroup] of this.mobs) {
 			if (this.protectionField) {
 				game.physics.arcade.collide(this.protectionField, mobGroup, (field, mob) => {
-					if (mob.parent.name != 'tiret') {
+					if (!this._isBoss(mob.parent.name)) {
 						this.killMob(mob)
 					}
 				})
@@ -269,7 +291,7 @@ class SpikeImpactGame {
 			}, null, this)
 			if (!this.protectionField) {
 				game.physics.arcade.collide(this.twilightBody, mobGroup, (twi, mob) => {
-					if (mob.parent.name != 'tiret') {
+					if (!this._isBoss(mob.parent.name)) {
 						this.killMob(mob)
 					}
 					this.health.damage()
@@ -348,12 +370,14 @@ class SpikeImpactGame {
 		this.game.scale.setUserScale(scaleFactor, scaleFactor, 0, 0)
 	}
 
+	_isBoss = (name) => name === 'tiret'
+
 	spawnMob = (mobType, coords, health, score) => {
 		let mob = this.mobs.get(mobType).create(coords.x, coords.y, 'lvl1', mobType + '00')
 		mob.health = health
 		mob.maxHealth = health
 		mob.score = score
-		if (mobType == 'tiret') {
+		if (this._isBoss(mobType)) {
 			let phase
 			let timer = this.game.time.events.loop(
 				Phaser.Timer.SECOND * 0.05,
@@ -388,10 +412,9 @@ class SpikeImpactGame {
 	killMob = (mob) => {
 		mob.kill()
 		this.score.add(mob.score)
-		if (mob.parent.name == 'tiret') {
+		if (this._isBoss(mob.parent.name)) {
 			this.gameOver = true
-			this.win = true
-			this.onGameOver()
+			this.nextLvl()
 		}
 	}
 
