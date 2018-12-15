@@ -192,5 +192,13 @@
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 1, "h": 4 },
 			"sourceSize": { "w": 1, "h": 4 }
 		}
+		,{
+			"filename": "discord00",
+			"frame": { "x": 120, "y": 127, "w": 76, "h": 81 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 81 },
+			"sourceSize": { "w": 76, "h": 81 }
+		}
 	]
 }

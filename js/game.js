@@ -42,49 +42,15 @@ class SpikeImpactGame {
 	preload = (game) => {
 		game.load.atlas('lvl1', 'img/sprite1.png', 'img/sprite1.json')
 		game.load.audio('bgmusic', 'snd/bgmusic.ogg')
+		game.load.audio('bgmusic2', 'snd/bgmusic2.ogg')
 		game.load.image('scoreFont', 'img/scoreFont.gif')
 	}
 
 	initGame = (game) => {
 		this.gameOver = false
 		this.win = false
+		this.winLvl = false
 
-		this.initLvl1(game)
-
-		document.querySelector('#viewport .loader').style.display = 'none'
-	}
-
-	initLvl1 = (game) => {
-		this.currentLevel = 1
-
-		this._initLvlGeneric(game)
-
-		game.stage.backgroundColor = '#587373'
-
-		game.world.setBounds(0, 0, 1800, fieldSize.HEIGHT)
-
-		this._initTwilight(game)
-
-		this.mobs = new Map()
-		for (let mobType in world.lvl1) {
-			this.mobs.set(mobType, game.add.group(undefined, mobType))
-			let mobParams = world.lvl1[mobType]
-			mobParams.coords.forEach((coords) => this.spawnMob(
-				mobType,
-				coords,
-				mobParams.health,
-				mobParams.score
-			))
-		}
-
-		game.physics.arcade.enable([...this.mobs.values()])
-
-		game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++)
-
-		game.add.sound('bgmusic', 1, true).play()
-	}
-
-	_initLvlGeneric = (game) => {
 		window.addEventListener('resize', this._onResize)
 		this._onResize()
 
@@ -107,9 +73,9 @@ class SpikeImpactGame {
 					_this.gameOver = true
 					game.time.events.loop(
 						Phaser.Timer.SECOND * 0.05,
-						() => _this.twilight.cameraOffset.y += (accel++),
-						_this.onGameOver()
+						() => _this.twilight.cameraOffset.y += (accel++)
 					)
+					_this.onGameOver()
 				}
 				setText('*'.repeat(health))
 			}
@@ -180,15 +146,116 @@ class SpikeImpactGame {
 			this.updateManaBar()
 		}
 
+		this.initLvl1(game)
+
+		this._setupKeyboard(game)
+
+		document.querySelector('#viewport .loader').style.display = 'none'
+	}
+
+	initLvl1 = (game) => {
+		this.currentLevel = 1
+
+		this._initLvlGeneric(game)
+
+		game.stage.backgroundColor = '#587373'
+
+		game.world.setBounds(0, 0, 1800, fieldSize.HEIGHT)
+
+		this._initTwilight(game)
+
+		this.mobs = new Map()
+		for (let mobType in world.lvl1) {
+			this.mobs.set(mobType, game.add.group(undefined, mobType))
+			let mobParams = world.lvl1[mobType]
+			mobParams.coords.forEach((coords) => this.spawnMob(
+				mobType,
+				coords,
+				mobParams.health,
+				mobParams.score
+			))
+		}
+
+		game.physics.arcade.enable([...this.mobs.values()])
+
+		this.timers.push(game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++))
+
+		game.add.sound('bgmusic', 1, true).play()
+	}
+
+	initLvl2 = (game) => {
+		this.currentLevel = 2
+
+		this._initLvlGeneric(game)
+
+		game.stage.backgroundColor = '#735858'
+
+		game.world.setBounds(0, 0, 1800, fieldSize.HEIGHT)
+
+		this._initTwilight(game)
+
+		this.mobs = new Map()
+		for (let mobType in world.lvl2) {
+			this.mobs.set(mobType, game.add.group(undefined, mobType))
+			let mobParams = world.lvl2[mobType]
+			mobParams.coords.forEach((coords) => this.spawnMob(
+				mobType,
+				coords,
+				mobParams.health,
+				mobParams.score
+			))
+		}
+
+		game.physics.arcade.enable([...this.mobs.values()])
+
+		this.timers.push(game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++))
+
+		game.add.sound('bgmusic2', 1, true).play()
+	}
+
+	_initLvlGeneric = (game) => {
+		this.winLvl = false
+
 		this.scrolls = game.add.group()
 		this.counterblows = game.add.group()
 
-		this._setupKeyboard(game)
+		this.timers = []
+
+		game.camera.x = 0
+	}
+
+	destroyLvl = () => {
+		this.twilight.destroy()
+		this.scrolls.destroy()
+		this.counterblows.destroy()
+		this.mobs.forEach((group) => group.destroy())
+		this.timers.forEach((timer) => this._removeTimer(timer))
+	}
+
+	animatedNextLvl = () => {
+		let accel = 1
+		this.winLvl = true
+
+		const timer = this.game.time.events.loop(
+			Phaser.Timer.SECOND * 0.05,
+			() => {
+				this.twilight.cameraOffset.x += (accel += 0.5)
+				if (this.twilight.cameraOffset.x > fieldSize.WIDTH) {
+					this._removeTimer(timer)
+					this.nextLvl()
+				}
+			},
+			this
+		)
 	}
 
 	nextLvl = () => {
 		if (this.currentLevel === 1) {
+			this.destroyLvl()
+			this.initLvl2(this.game)
+		} else if (this.currentLevel === 2) {
 			this.win = true
+			this.gameOver = true
 			this.onGameOver()
 		}
 	}
@@ -207,7 +274,7 @@ class SpikeImpactGame {
 		this.twilightWing = game.add.sprite(9, 18, 'lvl1', 'twilightWing')
 
 		this.twilightWing.anchor.setTo(0, 1)
-		game.time.events.loop(Phaser.Timer.SECOND * 0.4, () => this.twilightWing.scale.y = -this.twilightWing.scale.y)
+		this.timers.push(game.time.events.loop(Phaser.Timer.SECOND * 0.4, () => this.twilightWing.scale.y = -this.twilightWing.scale.y))
 
 		this.twilight.addChild(this.twilightBody)
 		this.twilight.addChild(this.spike)
@@ -289,7 +356,7 @@ class SpikeImpactGame {
 				this._mobDamage(mob, mobType, 1)
 				scroll.kill()
 			}, null, this)
-			if (!this.protectionField) {
+			if (!this.protectionField && !this.winLvl) {
 				game.physics.arcade.collide(this.twilightBody, mobGroup, (twi, mob) => {
 					if (!this._isBoss(mob.parent.name)) {
 						this.killMob(mob)
@@ -370,7 +437,7 @@ class SpikeImpactGame {
 		this.game.scale.setUserScale(scaleFactor, scaleFactor, 0, 0)
 	}
 
-	_isBoss = (name) => name === 'tiret'
+	_isBoss = (name) => name === 'tiret' || name === 'discord'
 
 	spawnMob = (mobType, coords, health, score) => {
 		let mob = this.mobs.get(mobType).create(coords.x, coords.y, 'lvl1', mobType + '00')
@@ -413,8 +480,7 @@ class SpikeImpactGame {
 		mob.kill()
 		this.score.add(mob.score)
 		if (this._isBoss(mob.parent.name)) {
-			this.gameOver = true
-			this.nextLvl()
+			this.animatedNextLvl()
 		}
 	}
 
