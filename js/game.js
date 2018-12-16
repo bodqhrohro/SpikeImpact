@@ -146,6 +146,17 @@ class SpikeImpactGame {
 			this.updateManaBar()
 		}
 
+		this.soundIndicator = new (function(_this) {
+			this.font = game.add.retroFont('scoreFont', 6, 7, '10', 2, 1, 0, 70)
+			this.font.setText('1')
+
+			this.text = game.add.image(280, TOP_BAR_Y_OFFSET, this.font)
+			this.text.fixedToCamera = true
+
+			_this.game.sound.onMute.add(() => this.font.setText('0'))
+			_this.game.sound.onUnMute.add(() => this.font.setText('1'))
+		})(this)
+
 		this.initLvl1(game)
 
 		this._setupKeyboard(game)
@@ -180,7 +191,8 @@ class SpikeImpactGame {
 
 		this.timers.push(game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++))
 
-		game.add.sound('bgmusic', 1, true).play()
+		this.sound = game.add.sound('bgmusic', 1, true)
+		this.sound.play()
 	}
 
 	initLvl2 = (game) => {
@@ -210,7 +222,8 @@ class SpikeImpactGame {
 
 		this.timers.push(game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++))
 
-		game.add.sound('bgmusic2', 1, true).play()
+		this.sound = game.add.sound('bgmusic2', 1, true)
+		this.sound.play()
 	}
 
 	_initLvlGeneric = (game) => {
@@ -230,6 +243,7 @@ class SpikeImpactGame {
 		this.counterblows.destroy()
 		this.mobs.forEach((group) => group.destroy())
 		this.timers.forEach((timer) => this._removeTimer(timer))
+		this.sound.destroy()
 	}
 
 	animatedNextLvl = () => {
