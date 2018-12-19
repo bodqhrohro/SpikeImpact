@@ -19,8 +19,29 @@ const scoreFontSize = {
 }
 
 const TOP_BAR_Y_OFFSET = 1
+const MOB_Y_GAP = 20
 
-let randGen = new Phaser.RandomDataGenerator()
+const randGen = new Phaser.RandomDataGenerator()
+
+const getAnimationGenerator = (coord, width, height) => {
+	const { x: x, y: y, animation: animation } = coord
+	const [ func, axis ] = animation.split('-')
+	let phase = 1
+	const GAP_BOTTOM = fieldSize.HEIGHT - height - MOB_Y_GAP
+
+	if (axis === 'x') {
+		return (x, y) => ({ x, y })
+	} else {
+		return (x, y) => {
+			if (y <= MOB_Y_GAP) {
+				phase = 1
+			} else if (y >= GAP_BOTTOM) {
+				phase = -1
+			}
+			return { x, y: y + phase }
+		}
+	}
+}
 
 class SpikeImpactGame {
 	constructor() {
@@ -75,6 +96,7 @@ class SpikeImpactGame {
 						Phaser.Timer.SECOND * 0.05,
 						() => _this.twilight.cameraOffset.y += (accel++)
 					)
+					_this._clearTimers()
 					_this.onGameOver()
 				}
 				setText('*'.repeat(health))
@@ -202,7 +224,7 @@ class SpikeImpactGame {
 
 		game.stage.backgroundColor = '#735858'
 
-		game.world.setBounds(0, 0, 1800, fieldSize.HEIGHT)
+		game.world.setBounds(0, 0, 2100, fieldSize.HEIGHT)
 
 		this._initTwilight(game)
 
@@ -237,12 +259,14 @@ class SpikeImpactGame {
 		game.camera.x = 0
 	}
 
+	_clearTimers = () => this.timers.forEach((timer) => this._removeTimer(timer))
+
 	destroyLvl = () => {
 		this.twilight.destroy()
 		this.scrolls.destroy()
 		this.counterblows.destroy()
 		this.mobs.forEach((group) => group.destroy())
-		this.timers.forEach((timer) => this._removeTimer(timer))
+		this._clearTimers()
 		this.sound.destroy()
 	}
 
@@ -270,6 +294,7 @@ class SpikeImpactGame {
 		} else if (this.currentLevel === 2) {
 			this.win = true
 			this.gameOver = true
+			this._clearTimers()
 			this.onGameOver()
 		}
 	}
@@ -323,6 +348,8 @@ class SpikeImpactGame {
 		game.input.keyboard.addKey(Phaser.KeyCode.Z).onUp.add(() => game.sound.mute = !game.sound.mute)
 	}
 
+	_isProtected = () => this.protectionField || this.winLvl
+
 	update = (game) => {
 		if (this.gameOver) return
 		let wasMovedX = false
@@ -370,16 +397,20 @@ class SpikeImpactGame {
 				this._mobDamage(mob, mobType, 1)
 				scroll.kill()
 			}, null, this)
-			if (!this.protectionField && !this.winLvl) {
+			if (!this._isProtected()) {
 				game.physics.arcade.collide(this.twilightBody, mobGroup, (twi, mob) => {
 					if (!this._isBoss(mob.parent.name)) {
 						this.killMob(mob)
 					}
-					this.health.damage()
+					if (!this._isProtected()) {
+						this.health.damage()
+					}
 				})
 				game.physics.arcade.collide(this.twilightBody, this.counterblows, (twi, bullet) => {
 					bullet.kill()
-					this.health.damage()
+					if (!this._isProtected()) {
+						this.health.damage()
+					}
 				})
 			}
 		}
@@ -454,12 +485,16 @@ class SpikeImpactGame {
 	_isBoss = (name) => name === 'tiret' || name === 'discord'
 
 	spawnMob = (mobType, coords, health, score) => {
+		const isBoss = this._isBoss(mobType)
+
 		let mob = this.mobs.get(mobType).create(coords.x, coords.y, 'lvl1', mobType + '00')
 		mob.health = health
 		mob.maxHealth = health
 		mob.score = score
-		if (this._isBoss(mobType)) {
-			let phase
+
+		const animation = coords.animation ? getAnimationGenerator(coords, mob.width, mob.height) : null
+
+		if (animation || isBoss) {
 			let timer = this.game.time.events.loop(
 				Phaser.Timer.SECOND * 0.05,
 				() => {
@@ -467,12 +502,7 @@ class SpikeImpactGame {
 						this._removeTimer(timer)
 						return
 					}
-					if (mob.y <= 20) {
-						phase = 1
-					} else if (mob.y >= 70) {
-						phase = -1
-					}
-					if (mob.inCamera && Math.random() < 0.05) {
+					if (isBoss && mob.inCamera && Math.random() < 0.05) {
 						this.createBullet(
 							mob.world.x + mob.width / 2,
 							randGen.between(mob.y + 20, mob.bottom - 20),
@@ -480,10 +510,16 @@ class SpikeImpactGame {
 							'tiretSplash00',
 						)
 					}
-					mob.y += phase
+					if (animation) {
+						let { x, y } = animation(mob.x, mob.y)
+						mob.x = x
+						mob.y = y
+					}
 				}
 			)
-		} else {
+		}
+
+		if (!isBoss) {
 			mob.animations.add(mobType + 'Fly', Phaser.Animation.generateFrameNames(mobType, 0, 1, '', 2))
 			mob.animations.play(mobType + 'Fly', 2, true)
 		}
