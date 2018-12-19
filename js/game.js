@@ -507,7 +507,7 @@ class SpikeImpactGame {
 							mob.world.x + mob.width / 2,
 							randGen.between(mob.y + 20, mob.bottom - 20),
 							'lvl1',
-							'tiretSplash00',
+							mobType === 'tiret' ? 'tiretSplash00' : 'voice00',
 						)
 					}
 					if (animation) {

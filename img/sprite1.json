@@ -200,5 +200,13 @@
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 81 },
 			"sourceSize": { "w": 76, "h": 81 }
 		}
+		,{
+			"filename": "voice00",
+			"frame": { "x": 81, "y": 55, "w": 26, "h": 11 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 26, "h": 11 },
+			"sourceSize": { "w": 26, "h": 11 }
+		}
 	]
 }
