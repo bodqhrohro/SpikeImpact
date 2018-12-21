@@ -79,10 +79,11 @@ class SpikeImpactGame {
 		game.stage.smoothed = false
 
 		this.health = new (function(_this) {
-			var setText = (text) => text ? this.font.setText(text, false, 1) : this.font.clear()
+			const setText = (text) => text ? this.font.setText(text, false, 1) : this.font.clear()
+			const updateText = () => setText('*'.repeat(health))
 
-			var health = 2
-			var accel = 1
+			let health = 2
+			let accel = 1
 
 			this.damage = () => {
 				if (--health) {
@@ -99,11 +100,16 @@ class SpikeImpactGame {
 					_this._clearTimers()
 					_this.onGameOver()
 				}
-				setText('*'.repeat(health))
+				updateText()
+			}
+
+			this.heal = () => {
+				health++
+				updateText()
 			}
 
 			this.font = game.add.retroFont('scoreFont', scoreFontSize.WIDTH, scoreFontSize.HEIGHT, '*', 1, 1, 0, 65)
-			setText('**')
+			updateText()
 
 			this.text = game.add.image(1, TOP_BAR_Y_OFFSET, this.font)
 			this.text.fixedToCamera = true
@@ -387,17 +393,21 @@ class SpikeImpactGame {
 			}
 		}
 		const beamDamage = (beam, mob) => {
-			this._mobDamage(mob, 0.3)
+			if (!this._isGem(mob.parent.name)) {
+				this._mobDamage(mob, 0.3)
+			}
 		}
 		const scrollDamage = (mob, scroll) => {
-			this._mobDamage(mob, 1)
-			scroll.kill()
+			if (!this._isGem(mob.parent.name)) {
+				this._mobDamage(mob, 1)
+				scroll.kill()
+			}
 		}
 		const mobDamage = (twi, mob) => {
 			if (!this._isBoss(mob.parent.name)) {
 				this.killMob(mob)
 			}
-			if (!this._isProtected()) {
+			if (!this._isProtected() && !this._isGem(mob.parent.name)) {
 				this.health.damage()
 			}
 		}
@@ -502,6 +512,8 @@ class SpikeImpactGame {
 
 	_isBoss = (name) => name === 'tiret' || name === 'discord'
 
+	_isGem = (name) => name === 'gem'
+
 	spawnMob = (mobType, coords, health, score) => {
 		const isBoss = this._isBoss(mobType)
 
@@ -543,7 +555,7 @@ class SpikeImpactGame {
 									'voice',
 									{ x: counterblowX, y: counterblowY },
 									2,
-									8,
+									0,
 								))
 							}
 						}
@@ -589,9 +601,18 @@ class SpikeImpactGame {
 
 	killMob = (mob) => {
 		mob.kill()
-		this.score.add(mob.score)
-		if (this._isBoss(mob.parent.name)) {
-			this.animatedNextLvl()
+		const name = mob.parent.name
+		if (this._isGem(name)) {
+			if (Math.random() < 0.5) {
+				this.health.heal()
+			} else {
+				this.mana.amount = this.mana.MANA_MAX
+			}
+		} else {
+			this.score.add(mob.score)
+			if (this._isBoss(name)) {
+				this.animatedNextLvl()
+			}
 		}
 	}
 

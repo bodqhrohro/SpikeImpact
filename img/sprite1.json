@@ -208,5 +208,13 @@
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 26, "h": 11 },
 			"sourceSize": { "w": 26, "h": 11 }
 		}
+		,{
+			"filename": "gem00",
+			"frame": { "x": 70, "y": 55, "w": 7, "h": 11 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 7, "h": 11 },
+			"sourceSize": { "w": 7, "h": 11 }
+		}
 	]
 }

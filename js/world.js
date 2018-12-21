@@ -167,6 +167,13 @@ export default {
 			],
 			health: 30,
 			score: 200
+		},
+		'gem': {
+			coords: [
+				{ x: 1080, y: 180  },
+			],
+			health: 0.2,
+			score: 0
 		}
 	}
 }
