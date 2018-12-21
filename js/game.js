@@ -239,6 +239,7 @@ class SpikeImpactGame {
 				mobParams.score
 			))
 		}
+		this.mobs.set('voice', game.add.group(undefined, 'voice'))
 
 		game.physics.arcade.enable([...this.mobs.values()])
 
@@ -253,6 +254,7 @@ class SpikeImpactGame {
 
 		this.scrolls = game.add.group()
 		this.counterblows = game.add.group()
+		this.activeCounterblows = game.add.group()
 
 		this.timers = []
 
@@ -265,6 +267,7 @@ class SpikeImpactGame {
 		this.twilight.destroy()
 		this.scrolls.destroy()
 		this.counterblows.destroy()
+		this.activeCounterblows.destroy()
 		this.mobs.forEach((group) => group.destroy())
 		this._clearTimers()
 		this.sound.destroy()
@@ -378,42 +381,56 @@ class SpikeImpactGame {
 		}
 
 		// collisions
-		for (let [mobType, mobGroup] of this.mobs) {
+		const fieldDamage = (field, mob) => {
+			if (!this._isBoss(mob.parent.name)) {
+				this.killMob(mob)
+			}
+		}
+		const beamDamage = (beam, mob) => {
+			this._mobDamage(mob, 0.3)
+		}
+		const scrollDamage = (mob, scroll) => {
+			this._mobDamage(mob, 1)
+			scroll.kill()
+		}
+		const mobDamage = (twi, mob) => {
+			if (!this._isBoss(mob.parent.name)) {
+				this.killMob(mob)
+			}
+			if (!this._isProtected()) {
+				this.health.damage()
+			}
+		}
+		const mobGroupCollisions = (mobGroup) => {
 			if (this.protectionField) {
-				game.physics.arcade.collide(this.protectionField, mobGroup, (field, mob) => {
-					if (!this._isBoss(mob.parent.name)) {
-						this.killMob(mob)
-					}
-				})
+				game.physics.arcade.collide(this.protectionField, mobGroup, fieldDamage)
 			}
 
 			if (this.beam) {
-				game.physics.arcade.collide(this.beam, mobGroup, (beam, mob) => {
-					this._mobDamage(mob, mobType, 0.3)
-				})
+				game.physics.arcade.collide(this.beam, mobGroup, beamDamage)
 			}
 
-			game.physics.arcade.collide(mobGroup, this.scrolls, (mob, scroll) => {
-				this._mobDamage(mob, mobType, 1)
-				scroll.kill()
-			}, null, this)
+			game.physics.arcade.collide(mobGroup, this.scrolls, scrollDamage, null, this)
+
 			if (!this._isProtected()) {
-				game.physics.arcade.collide(this.twilightBody, mobGroup, (twi, mob) => {
-					if (!this._isBoss(mob.parent.name)) {
-						this.killMob(mob)
-					}
-					if (!this._isProtected()) {
-						this.health.damage()
-					}
-				})
-				game.physics.arcade.collide(this.twilightBody, this.counterblows, (twi, bullet) => {
-					bullet.kill()
-					if (!this._isProtected()) {
-						this.health.damage()
-					}
-				})
+				game.physics.arcade.collide(this.twilightBody, mobGroup, mobDamage)
 			}
 		}
+
+		for (let [mobType, mobGroup] of this.mobs) {
+			mobGroupCollisions(mobGroup)
+		}
+		mobGroupCollisions(this.activeCounterblows)
+		game.physics.arcade.collide(
+			this.twilightBody,
+			[ this.counterblows, this.activeCounterblows, ],
+			(twi, bullet) => {
+				bullet.kill()
+				if (!this._isProtected()) {
+					this.health.damage()
+				}
+			}
+		)
 
 		// mana
 		const oldMana = this.mana.amount
@@ -450,6 +467,7 @@ class SpikeImpactGame {
 		const [ x, y, level, type ] = args
 
 		const isScroll = type === 'scroll'
+
 		const bullet = this[isScroll ? 'scrolls' : 'counterblows'].create(...args)
 
 		this.game.physics.arcade.enable(bullet)
@@ -465,8 +483,8 @@ class SpikeImpactGame {
 			? bullet.position.x+=2
 			: bulletDestroy()
 		const counterblowUpdater = () => bullet.position.x - this.game.camera.x > fieldBounds.LEFT
-			? bullet.position.x-=3
-			: bulletDestroy()
+				? bullet.position.x-=3
+				: bulletDestroy()
 
 		const timer = this.game.time.events.loop(
 			Phaser.Timer.SECOND / 60,
@@ -495,6 +513,7 @@ class SpikeImpactGame {
 		const animation = coords.animation ? getAnimationGenerator(coords, mob.width, mob.height) : null
 
 		if (animation || isBoss) {
+			let phase = 0
 			let timer = this.game.time.events.loop(
 				Phaser.Timer.SECOND * 0.05,
 				() => {
@@ -502,13 +521,32 @@ class SpikeImpactGame {
 						this._removeTimer(timer)
 						return
 					}
-					if (isBoss && mob.inCamera && Math.random() < 0.05) {
-						this.createBullet(
-							mob.world.x + mob.width / 2,
-							randGen.between(mob.y + 20, mob.bottom - 20),
-							'lvl1',
-							mobType === 'tiret' ? 'tiretSplash00' : 'voice00',
-						)
+					if (isBoss && mob.inCamera) {
+						const counterblowX = mob.world.x + mob.width / 2
+						const counterblowY = randGen.between(mob.y + 20, mob.bottom - 20)
+
+						if (mobType === 'tiret') {
+							if (Math.random() < 0.05) {
+								this.createBullet(
+									counterblowX,
+									counterblowY,
+									'lvl1',
+									'tiretSplash00',
+								)
+							}
+						} else {
+							if (++phase >= 20) {
+								phase = 0
+							}
+							if (!phase) {
+								this.game.physics.arcade.enable(this.spawnMob(
+									'voice',
+									{ x: counterblowX, y: counterblowY },
+									2,
+									8,
+								))
+							}
+						}
 					}
 					if (animation) {
 						let { x, y } = animation(mob.x, mob.y)
@@ -517,6 +555,29 @@ class SpikeImpactGame {
 					}
 				}
 			)
+		} else {
+			const isActive = mobType === 'voice'
+			if (isActive) {
+				const timer = this.game.time.events.loop(
+					Phaser.Timer.SECOND / 60,
+					() => {
+						if (!mob.alive) {
+							this._removeTimer(timer)
+							return
+						}
+
+						const speed = 1
+						mob.x -= speed
+
+						const yDiff = this.twilight.cameraOffset.y - mob.y
+						if (yDiff >= 1) {
+							mob.y += speed
+						} else if (yDiff <= -1) {
+							mob.y -= speed
+						}
+					},
+				)
+			}
 		}
 
 		if (!isBoss) {
@@ -534,10 +595,11 @@ class SpikeImpactGame {
 		}
 	}
 
-	_mobDamage = (mob, mobType, amount) => {
+	_mobDamage = (mob, amount) => {
 		const game = this.game
 		if (mob.health - 0.01 > amount) {
 			mob.damage(amount)
+			const mobType = mob.parent.parent.name
 			if (!mobType.indexOf('parasprite')) {
 				game.time.events.add(
 					Phaser.Timer.SECOND * 2,

@@ -156,7 +156,7 @@ export default {
 				{ x: 1760, y: 132  },
 				{ x: 1730, y: 172  },
 				{ x: 1760, y: 132  },
-				{ x: 1892, y: 72   },
+				{ x: 1892, y: 72  , animation: 'linear-y' },
 			],
 			health: 7,
 			score: 30
