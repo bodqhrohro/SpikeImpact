@@ -216,5 +216,13 @@
 			"spriteSourceSize": { "x": 0, "y": 0, "w": 7, "h": 11 },
 			"sourceSize": { "w": 7, "h": 11 }
 		}
+		,{
+			"filename": "akio00",
+			"frame": { "x": 72, "y": 120, "w": 33, "h": 78 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 33, "h": 78 },
+			"sourceSize": { "w": 33, "h": 78 }
+		}
 	]
 }
