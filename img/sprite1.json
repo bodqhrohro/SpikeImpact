@@ -218,11 +218,19 @@
 		}
 		,{
 			"filename": "akio00",
-			"frame": { "x": 72, "y": 120, "w": 33, "h": 78 },
+			"frame": { "x": 72, "y": 120, "w": 39, "h": 78 },
 			"rotated": false,
 			"trimmed": true,
-			"spriteSourceSize": { "x": 0, "y": 0, "w": 33, "h": 78 },
-			"sourceSize": { "w": 33, "h": 78 }
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 39, "h": 78 },
+			"sourceSize": { "w": 39, "h": 78 }
+		}
+		,{
+			"filename": "yoba00",
+			"frame": { "x": 120, "y": 71, "w": 11, "h": 11 },
+			"rotated": false,
+			"trimmed": true,
+			"spriteSourceSize": { "x": 0, "y": 0, "w": 11, "h": 11 },
+			"sourceSize": { "w": 11, "h": 11 }
 		}
 	]
 }
