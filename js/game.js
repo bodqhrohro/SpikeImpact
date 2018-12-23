@@ -710,7 +710,7 @@ class SpikeImpactGame {
 		const game = this.game
 		if (mob.health - 0.01 > amount) {
 			mob.damage(amount)
-			const mobType = mob.parent.parent.name
+			const mobType = mob.parent.name
 			if (!mobType.indexOf('parasprite')) {
 				game.time.events.add(
 					Phaser.Timer.SECOND * 2,
