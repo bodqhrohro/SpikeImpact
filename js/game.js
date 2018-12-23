@@ -793,7 +793,7 @@ class SpikeImpactGame {
 	}
 
 	updateBeam = () => {
-		if (this.beam) {
+		if (this.beam && this.beam.body) {
 			if (this.beam.position.x !== this.beam.world.x) {
 				this.beam.width = fieldSize.WIDTH - (this.beam.world.x - this.game.camera.x)
 				this.beam.body.setSize(this.beam.width, this.beam.height)
