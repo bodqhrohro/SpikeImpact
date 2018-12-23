@@ -64,6 +64,7 @@ class SpikeImpactGame {
 		game.load.atlas('lvl1', 'img/sprite1.png', 'img/sprite1.json')
 		game.load.audio('bgmusic', 'snd/bgmusic.ogg')
 		game.load.audio('bgmusic2', 'snd/bgmusic2.ogg')
+		game.load.audio('bgmusic3', 'snd/bgmusic3.ogg')
 		game.load.image('scoreFont', 'img/scoreFont.gif')
 	}
 
@@ -255,6 +256,38 @@ class SpikeImpactGame {
 		this.sound.play()
 	}
 
+	initLvl3 = (game) => {
+		this.currentLevel = 3
+
+		this._initLvlGeneric(game)
+
+		game.stage.backgroundColor = '#331818'
+
+		game.world.setBounds(0, 0, 2100, fieldSize.HEIGHT)
+
+		this._initTwilight(game)
+
+		this.mobs = new Map()
+		for (let mobType in world.lvl3) {
+			this.mobs.set(mobType, game.add.group(undefined, mobType))
+			let mobParams = world.lvl3[mobType]
+			mobParams.coords.forEach((coords) => this.spawnMob(
+				mobType,
+				coords,
+				mobParams.health,
+				mobParams.score
+			))
+		}
+		this.mobs.set('yoba', game.add.group(undefined, 'yoba'))
+
+		game.physics.arcade.enable([...this.mobs.values()])
+
+		this.timers.push(game.time.events.loop(Phaser.Timer.SECOND * 0.05, () => game.camera.x++))
+
+		this.sound = game.add.sound('bgmusic3', 1, true)
+		this.sound.play()
+	}
+
 	_initLvlGeneric = (game) => {
 		this.winLvl = false
 
@@ -301,6 +334,9 @@ class SpikeImpactGame {
 			this.destroyLvl()
 			this.initLvl2(this.game)
 		} else if (this.currentLevel === 2) {
+			this.destroyLvl()
+			this.initLvl3(this.game)
+		} else if (this.currentLevel === 3) {
 			this.win = true
 			this.gameOver = true
 			this._clearTimers()
@@ -510,7 +546,7 @@ class SpikeImpactGame {
 		this.game.scale.setUserScale(scaleFactor, scaleFactor, 0, 0)
 	}
 
-	_isBoss = (name) => name === 'tiret' || name === 'discord'
+	_isBoss = (name) => name === 'tiret' || name === 'discord' || name === 'akio'
 
 	_isGem = (name) => name === 'gem'
 
@@ -521,6 +557,10 @@ class SpikeImpactGame {
 		mob.health = health
 		mob.maxHealth = health
 		mob.score = score
+
+		if (isBoss) {
+			mob.autoCull = true
+		}
 
 		const animation = coords.animation ? getAnimationGenerator(coords, mob.width, mob.height) : null
 
@@ -534,8 +574,23 @@ class SpikeImpactGame {
 						return
 					}
 					if (isBoss && mob.inCamera) {
-						const counterblowX = mob.world.x + mob.width / 2
-						const counterblowY = randGen.between(mob.y + 20, mob.bottom - 20)
+						let counterblowX, counterblowY
+						if (mobType === 'akio') {
+							const plTint = 0xe3fff5
+							const plBlendMode = Phaser.PIXI.blendModes.SCREEN
+							if (this.twilightBody.tint !== plTint) {
+								this.twilightBody.tint = plTint
+								this.twilightBody.blendMode = plBlendMode
+								this.twilightWing.tint = plTint
+								this.twilightWing.blendMode = plBlendMode
+							}
+
+							counterblowX = mob.world.x - 11
+							counterblowY = mob.world.y + 10
+						} else {
+							counterblowX = mob.world.x + mob.width / 2
+							counterblowY = randGen.between(mob.y + 20, mob.bottom - 20)
+						}
 
 						if (mobType === 'tiret') {
 							if (Math.random() < 0.05) {
@@ -552,7 +607,7 @@ class SpikeImpactGame {
 							}
 							if (!phase) {
 								this.game.physics.arcade.enable(this.spawnMob(
-									'voice',
+									mobType === 'discord' ? 'voice' : 'yoba',
 									{ x: counterblowX, y: counterblowY },
 									2,
 									0,
@@ -568,7 +623,7 @@ class SpikeImpactGame {
 				}
 			)
 		} else {
-			const isActive = mobType === 'voice'
+			const isActive = mobType === 'voice' || mobType === 'yoba'
 			if (isActive) {
 				const timer = this.game.time.events.loop(
 					Phaser.Timer.SECOND / 60,
@@ -607,6 +662,7 @@ class SpikeImpactGame {
 				this.health.heal()
 			} else {
 				this.mana.amount = this.mana.MANA_MAX
+				this.mana.updateManaBar()
 			}
 		} else {
 			this.score.add(mob.score)
