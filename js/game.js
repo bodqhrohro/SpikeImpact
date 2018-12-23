@@ -87,7 +87,7 @@ class SpikeImpactGame {
 			let accel = 1
 
 			this.damage = () => {
-				if (--health) {
+				if (--health > 0) {
 					_this.twilight.cameraOffset.x = 30
 					_this.twilight.cameraOffset.y = 30
 					_this.activateField('defense')
@@ -99,6 +99,7 @@ class SpikeImpactGame {
 						() => _this.twilight.cameraOffset.y += (accel++)
 					)
 					_this._clearTimers()
+					health = 0
 					_this.onGameOver()
 				}
 				updateText()
@@ -529,7 +530,7 @@ class SpikeImpactGame {
 			? bullet.position.x+=2
 			: bulletDestroy()
 		const counterblowUpdater = () => bullet.position.x - this.game.camera.x > fieldBounds.LEFT
-				? bullet.position.x-=3
+				? bullet.position.x-=2
 				: bulletDestroy()
 
 		const timer = this.game.time.events.loop(
@@ -558,7 +559,7 @@ class SpikeImpactGame {
 		mob.maxHealth = health
 		mob.score = score
 
-		if (isBoss) {
+		if (isBoss || coords.defense) {
 			mob.autoCull = true
 		}
 
@@ -641,6 +642,31 @@ class SpikeImpactGame {
 							mob.y += speed
 						} else if (yDiff <= -1) {
 							mob.y -= speed
+						}
+					},
+				)
+			}
+			if (coords.defense) {
+				const phaseMax = 1000
+				let phase = (Math.random() * 1000) | 0
+				const timer = this.game.time.events.loop(
+					Phaser.Timer.SECOND / 60,
+					() => {
+						if (!mob.alive) {
+							this._removeTimer(timer)
+							return
+						}
+
+						if (++phase >= 1000) {
+							phase = 0
+						}
+						if (mob.inCamera && !phase) {
+							this.createBullet(
+								mob.world.x - 10,
+								mob.y,
+								'lvl1',
+								'tiretSplash00',
+							)
 						}
 					},
 				)
