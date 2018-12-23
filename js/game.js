@@ -567,6 +567,9 @@ class SpikeImpactGame {
 
 		if (animation || isBoss) {
 			let phase = 0
+			const PHASE_BOSS_ATTACK_THRESHOLD = 425
+			const PHASE_BOSS_RETURN_THRESHOLD = 450
+			const PHASE_RESET_THRESHOLD = mobType === 'akio' ? 500 : 400
 			let timer = this.game.time.events.loop(
 				Phaser.Timer.SECOND * 0.05,
 				() => {
@@ -603,10 +606,10 @@ class SpikeImpactGame {
 								)
 							}
 						} else {
-							if (++phase >= 20) {
+							if (++phase >= PHASE_RESET_THRESHOLD) {
 								phase = 0
 							}
-							if (!phase) {
+							if (!(phase % 20) && phase < PHASE_BOSS_ATTACK_THRESHOLD) {
 								this.game.physics.arcade.enable(this.spawnMob(
 									mobType === 'discord' ? 'voice' : 'yoba',
 									{ x: counterblowX, y: counterblowY },
@@ -614,9 +617,14 @@ class SpikeImpactGame {
 									0,
 								))
 							}
+							if (phase >= PHASE_BOSS_RETURN_THRESHOLD) {
+								mob.x += 3
+							} else if (phase >= PHASE_BOSS_ATTACK_THRESHOLD) {
+								mob.x -= 6
+							}
 						}
 					}
-					if (animation) {
+					if (animation && phase < PHASE_BOSS_ATTACK_THRESHOLD) {
 						let { x, y } = animation(mob.x, mob.y)
 						mob.x = x
 						mob.y = y
