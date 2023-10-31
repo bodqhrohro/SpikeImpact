@@ -382,6 +382,14 @@ class SpikeImpactGame {
 
 	_setupKeyboard = (game) => {
 		this.input = Object.assign(game.input.keyboard.createCursorKeys(), {
+			one: game.input.keyboard.addKey(Phaser.KeyCode.ONE),
+			three: game.input.keyboard.addKey(Phaser.KeyCode.THREE),
+			four: game.input.keyboard.addKey(Phaser.KeyCode.FOUR),
+			six: game.input.keyboard.addKey(Phaser.KeyCode.SIX),
+			eight: game.input.keyboard.addKey(Phaser.KeyCode.EIGHT),
+			zero: game.input.keyboard.addKey(Phaser.KeyCode.ZERO),
+			seven: game.input.keyboard.addKey(Phaser.KeyCode.SEVEN),
+			nine: game.input.keyboard.addKey(Phaser.KeyCode.NINE),
 			space: game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR),
 			enter: game.input.keyboard.addKey(Phaser.KeyCode.ENTER),
 			tab: game.input.keyboard.addKey(Phaser.KeyCode.TAB),
@@ -401,21 +409,21 @@ class SpikeImpactGame {
 		let wasMovedX = false
 
 		// keyboard
-		if (this.input.up.isDown || this.input.w.isDown) {
+		if (this.input.up.isDown || this.input.w.isDown || this.input.eight.isDown) {
 			this.twilightWing.scale.y = -1
 			this._setIf((y) => y-=2, (y) => y > fieldBounds.UP, this.twilight.cameraOffset, 'y')
-		} else if (this.input.down.isDown || this.input.s.isDown) {
+		} else if (this.input.down.isDown || this.input.s.isDown || this.input.zero.isDown) {
 			this.twilightWing.scale.y = 1
 			this._setIf((y) => y+=2, (y) => y < fieldBounds.BOTTOM - 19, this.twilight.cameraOffset, 'y')
-		} else if (this.input.left.isDown || this.input.a.isDown) {
+		} else if (this.input.left.isDown || this.input.a.isDown || this.input.seven.isDown) {
 			this._setIf((x) => x-=2, (x) => x > fieldBounds.LEFT, this.twilight.cameraOffset, 'x')
 			wasMovedX = true
-		} else if (this.input.right.isDown || this.input.d.isDown) {
+		} else if (this.input.right.isDown || this.input.d.isDown || this.input.nine.isDown) {
 			this._setIf((x) => x+=2, (x) => x < fieldBounds.RIGHT - 30, this.twilight.cameraOffset, 'x')
 			wasMovedX = true
-		} else if (this.input.space.isDown || this.input.enter.isDown) {
+		} else if (this.input.space.isDown || this.input.enter.isDown || this.input.one.isDown || this.input.three.isDown) {
 			this.spikePaw.animations.play('throw')
-		} else if (this.input.tab.isDown || this.input.shift.isDown) {
+		} else if (this.input.tab.isDown || this.input.shift.isDown || this.input.four.isDown || this.input.six.isDown) {
 			if (this.mana.amount >= this.mana.MANA_MAX) {
 				this.activateField('attack')
 			} else if (this.mana.amount >= this.mana.MANA_MAX / 3) {
